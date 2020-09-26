@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:illinois/service/Styles.dart';
@@ -5,6 +6,8 @@ import 'package:illinois/ui/explore/ExplorePanel.dart';
 import 'package:illinois/ui/widgets/HeaderBar.dart';
 import 'package:illinois/ui/widgets/SectionTitlePrimary.dart';
 import 'package:illinois/ui/widgets/TabBarWidget.dart';
+
+import 'CommunitiesInfo.dart';
 
 class CommunitiesPage extends StatelessWidget {
   @override
@@ -91,7 +94,10 @@ class CommunityCard extends StatelessWidget {
                       padding: EdgeInsets.only(top: 80),
                       child: MaterialButton(
                           color: Colors.white,
-                          onPressed: () {},
+                          onPressed: () => Navigator.push(context,
+                                  CupertinoPageRoute(builder: (context) {
+                                return CommunityInfoPage();
+                              })),
                           child: Text('Visit', style: TextStyle())),
                     ),
                   ],

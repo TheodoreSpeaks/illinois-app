@@ -41,7 +41,7 @@ class Event with Explore implements Favorite {
   String placeID;
 
   Location location;
-  
+
   int convergeScore;
   String convergeUrl;
 
@@ -50,6 +50,8 @@ class Event with Explore implements Favorite {
   String endDateString;
   DateTime startDateGmt;
   DateTime endDateGmt;
+  String timeString;
+  String locationString;
   String category;
   String subCategory;
   String sponsor;
@@ -83,41 +85,53 @@ class Event with Explore implements Favorite {
   Event({Map<String, dynamic> json, Event other}) {
     if (json != null) {
       _initFromJson(json);
-    }
-    else if (other != null) {
+    } else if (other != null) {
       _initFromOther(other);
     }
   }
 
   void _initFromJson(Map<String, dynamic> json) {
     dynamic targetAudienceJson = json['targetAudience'];
-    List<String> targetAudience = targetAudienceJson != null ? List.from(targetAudienceJson) : null;
-    
+    List<String> targetAudience =
+        targetAudienceJson != null ? List.from(targetAudienceJson) : null;
+
     dynamic tagsJson = json['tags'];
     List<String> tags = tagsJson != null ? List.from(tagsJson) : null;
-    
+
     List<dynamic> contactsJson = json['contacts'];
-    List<Contact> contacts = (contactsJson != null) ? contactsJson.map((value) => Contact.fromJson(value)).toList() : null;
-    
+    List<Contact> contacts = (contactsJson != null)
+        ? contactsJson.map((value) => Contact.fromJson(value)).toList()
+        : null;
+
     List<dynamic> recurringEventsJson = json['recurringEvents'];
-    List<Event> recurringEvents = (recurringEventsJson != null) ? recurringEventsJson.map((value) => Event.fromJson(value)).toList() : null;
+    List<Event> recurringEvents = (recurringEventsJson != null)
+        ? recurringEventsJson.map((value) => Event.fromJson(value)).toList()
+        : null;
 
     List<dynamic> subEventsJson = json['subEvents'];
-    List<Map<String, dynamic>> subEventsMap = _constructSubEventsMap(subEventsJson);
+    List<Map<String, dynamic>> subEventsMap =
+        _constructSubEventsMap(subEventsJson);
 
     id = json["id"];
     title = json['title'];
     subTitle = json['subTitle'];
     shortDescription = json['shortDescription'];
-    longDescription = json.containsKey("description") ? json["description"] : json['longDescription']; /*Back compatibility keep until we use longDescription */
+    longDescription = json.containsKey("description")
+        ? json["description"]
+        : json[
+            'longDescription']; /*Back compatibility keep until we use longDescription */
+    timeString = json['timeString'];
+    locationString = json['locationString'];
     imageURL = json['imageURL'];
     placeID = json['placeID'];
     location = Location.fromJSON(json['location']);
     eventId = json['eventId'];
     startDateString = json['startDate'];
     endDateString = json['endDate'];
-    startDateGmt = AppDateTime().dateTimeFromString(json['startDate'], format: AppDateTime.serverResponseDateTimeFormat, isUtc: true);
-    endDateGmt = AppDateTime().dateTimeFromString(json['endDate'], format: AppDateTime.serverResponseDateTimeFormat, isUtc: true);
+    startDateGmt = AppDateTime().dateTimeFromString(json['startDate'],
+        format: AppDateTime.serverResponseDateTimeFormat, isUtc: true);
+    endDateGmt = AppDateTime().dateTimeFromString(json['endDate'],
+        format: AppDateTime.serverResponseDateTimeFormat, isUtc: true);
     category = json['category'];
     subCategory = json['subCategory'];
     sponsor = json['sponsor'];
@@ -206,18 +220,16 @@ class Event with Explore implements Favorite {
       "placeID": placeID,
       "location": location?.toJson(),
 
-      "eventId" : eventId,
+      "eventId": eventId,
       "startDate": startDateString,
-      "startDateLocal": AppDateTime().formatDateTime(
-          startDateLocal, format: AppDateTime.iso8601DateTimeFormat,
-          ignoreTimeZone: true),
+      "startDateLocal": AppDateTime().formatDateTime(startDateLocal,
+          format: AppDateTime.iso8601DateTimeFormat, ignoreTimeZone: true),
       "endDate": endDateString,
-      "endDateLocal": AppDateTime().formatDateTime(
-          endDateLocal, format: AppDateTime.iso8601DateTimeFormat,
-          ignoreTimeZone: true),
+      "endDateLocal": AppDateTime().formatDateTime(endDateLocal,
+          format: AppDateTime.iso8601DateTimeFormat, ignoreTimeZone: true),
       "category": category,
       "subCategory": subCategory,
-      "sponsor": sponsor??"", // Required for CreateEvent
+      "sponsor": sponsor ?? "", // Required for CreateEvent
       "titleURL": titleUrl,
       "targetAudience": targetAudience,
       "icalUrl": icalUrl,
@@ -228,7 +240,8 @@ class Event with Explore implements Favorite {
       "cost": cost,
       "contacts": _encodeContacts(),
       "tags": tags,
-      "modifiedDate": AppDateTime().formatDateTime(modifiedDate, ignoreTimeZone: true),
+      "modifiedDate":
+          AppDateTime().formatDateTime(modifiedDate, ignoreTimeZone: true),
       "submissionResult": submissionResult,
       "allDay": allDay,
       "recurringFlag": recurringFlag,
@@ -247,9 +260,9 @@ class Event with Explore implements Favorite {
     return (json != null) && (json['eventId'] != null);
   }
 
-  List<dynamic> _encodeContacts(){
+  List<dynamic> _encodeContacts() {
     List<dynamic> result = new List();
-    if(contacts!=null && contacts.isNotEmpty) {
+    if (contacts != null && contacts.isNotEmpty) {
       contacts.forEach((Contact contact) {
         result.add(contact.toJson());
       });
@@ -337,7 +350,8 @@ class Event with Explore implements Favorite {
     _featuredEvents.add(event);
   }
 
-  static List<Map<String, dynamic>> _constructSubEventsMap(List<dynamic> subEventsJson) {
+  static List<Map<String, dynamic>> _constructSubEventsMap(
+      List<dynamic> subEventsJson) {
     if (subEventsJson == null || subEventsJson.isEmpty) {
       return null;
     }
@@ -351,22 +365,52 @@ class Event with Explore implements Favorite {
   }
 
   // Explore
-  
-  @override String   get exploreId               { return id ?? eventId; }
-  @override String   get exploreTitle            { return title; }
-  @override String   get exploreSubTitle         { return subTitle; }
-  @override String   get exploreShortDescription { return shortDescription; }
-  @override String   get exploreLongDescription  { return longDescription; }
-  @override String   get explorePlaceId          { return placeID; }
-  @override Location get exploreLocation         { return location; }
-  @override Color    get uiColor                 { return Styles().colors.eventColor; }
 
-  @override String   get exploreImageURL         {
-    if ((imageURL != null) && imageURL.isNotEmpty)
-      return imageURL;
+  @override
+  String get exploreId {
+    return id ?? eventId;
+  }
 
-    if (randomImageURL == null)
-      randomImageURL = _createRandomImageUrl();
+  @override
+  String get exploreTitle {
+    return title;
+  }
+
+  @override
+  String get exploreSubTitle {
+    return subTitle;
+  }
+
+  @override
+  String get exploreShortDescription {
+    return shortDescription;
+  }
+
+  @override
+  String get exploreLongDescription {
+    return longDescription;
+  }
+
+  @override
+  String get explorePlaceId {
+    return placeID;
+  }
+
+  @override
+  Location get exploreLocation {
+    return location;
+  }
+
+  @override
+  Color get uiColor {
+    return Styles().colors.eventColor;
+  }
+
+  @override
+  String get exploreImageURL {
+    if ((imageURL != null) && imageURL.isNotEmpty) return imageURL;
+
+    if (randomImageURL == null) randomImageURL = _createRandomImageUrl();
 
     return randomImageURL.isNotEmpty ? randomImageURL : null;
   }
@@ -374,7 +418,7 @@ class Event with Explore implements Favorite {
   @override
   Map<String, dynamic> get analyticsAttributes {
     Map<String, dynamic> attributes = {
-      Analytics.LogAttributeEventId:   exploreId,
+      Analytics.LogAttributeEventId: exploreId,
       Analytics.LogAttributeEventName: exploreTitle,
       Analytics.LogAttributeEventCategory: category,
       Analytics.LogAttributeRecurrenceId: recurrenceId,
@@ -383,13 +427,19 @@ class Event with Explore implements Favorite {
     return attributes;
   }
 
-  DateTime get startDateLocal     { return AppDateTime().getUniLocalTimeFromUtcTime(startDateGmt); }
-  DateTime get endDateLocal       { return AppDateTime().getUniLocalTimeFromUtcTime(endDateGmt); }
+  DateTime get startDateLocal {
+    return AppDateTime().getUniLocalTimeFromUtcTime(startDateGmt);
+  }
 
+  DateTime get endDateLocal {
+    return AppDateTime().getUniLocalTimeFromUtcTime(endDateGmt);
+  }
 
   static String favoriteKeyName = "eventIds";
-  @override String get favoriteId => exploreId;
-  @override String get favoriteKey => favoriteKeyName;
+  @override
+  String get favoriteId => exploreId;
+  @override
+  String get favoriteKey => favoriteKeyName;
 
   ///
   /// Specific for Events with 'Athletics' category
@@ -399,32 +449,23 @@ class Event with Explore implements Favorite {
   ///
   /// Requirement 2: 'If an event is longer than 1 day, then please show the Date as (for example) Sep 26 - Sep 29.'
   String get displayDateTime {
-    final String dateFormat = 'MMM dd';
-    final bool isAthleticsCategory = (category == 'Athletics');
-    int eventDays = (endDateGmt?.difference(startDateGmt)?.inDays ?? 0).abs();
-    bool eventIsMoreThanOneDay = (eventDays >= 1);
-    if (eventIsMoreThanOneDay) {
-      String startDateFormatted = AppDateTime().formatDateTime(startDateGmt, format: dateFormat, ignoreTimeZone: isAthleticsCategory);
-      String endDateFormatted = AppDateTime().formatDateTime(endDateGmt, format: dateFormat, ignoreTimeZone: isAthleticsCategory);
-      return '$startDateFormatted - $endDateFormatted';
-    } else {
-      if (isAthleticsCategory) {
-        return AppDateTime().formatDateTime(startDateGmt, format: dateFormat, ignoreTimeZone: true);
-      }
-      return AppDateTime().getDisplayDateTime(startDateGmt, allDay: allDay);
-    }
+    return timeString;
   }
 
   String get displayDate {
-    return AppDateTime().getDisplayDay(dateTimeUtc: startDateGmt, allDay: allDay);
+    return AppDateTime()
+        .getDisplayDay(dateTimeUtc: startDateGmt, allDay: allDay);
   }
 
   String get displayStartEndTime {
     if (allDay) {
-      return Localization().getStringEx('model.explore.time.all_day', 'All Day');
+      return Localization()
+          .getStringEx('model.explore.time.all_day', 'All Day');
     }
-    String startTime = AppDateTime().getDisplayTime(dateTimeUtc: startDateGmt, allDay: allDay);
-    String endTime = AppDateTime().getDisplayTime(dateTimeUtc: endDateGmt, allDay: allDay);
+    String startTime =
+        AppDateTime().getDisplayTime(dateTimeUtc: startDateGmt, allDay: allDay);
+    String endTime =
+        AppDateTime().getDisplayTime(dateTimeUtc: endDateGmt, allDay: allDay);
     String displayTime = '$startTime';
     if (AppString.isStringNotEmpty(endTime)) {
       displayTime += '-$endTime';
@@ -442,7 +483,8 @@ class Event with Explore implements Favorite {
   }
 
   String get displaySuperTime {
-    String date = AppDateTime().getDisplayDay(dateTimeUtc: startDateGmt, allDay: allDay);
+    String date =
+        AppDateTime().getDisplayDay(dateTimeUtc: startDateGmt, allDay: allDay);
     String time = displayStartEndTime;
     return '$date, $time';
   }
@@ -460,12 +502,7 @@ class Event with Explore implements Favorite {
   }
 
   String get timeDisplayString {
-    if (isRecurring) {
-      return displayRecurringDates;
-    } else if (isSuperEvent) {
-      return displaySuperDates;
-    }
-    return displayDateTime;
+    return timeString;
   }
 
   String _buildDisplayDates(Event firstEvent, Event lastEvent) {
@@ -473,32 +510,41 @@ class Event with Explore implements Favorite {
     DateTime startDateTime;
     DateTime endDateTime;
     if (useDeviceLocalTime) {
-      startDateTime = AppDateTime().getDeviceTimeFromUtcTime(firstEvent.startDateGmt);
-      endDateTime = AppDateTime().getDeviceTimeFromUtcTime(lastEvent.startDateGmt);
+      startDateTime =
+          AppDateTime().getDeviceTimeFromUtcTime(firstEvent.startDateGmt);
+      endDateTime =
+          AppDateTime().getDeviceTimeFromUtcTime(lastEvent.startDateGmt);
     } else {
-      startDateTime = AppDateTime().getUniLocalTimeFromUtcTime(firstEvent.startDateGmt);
-      endDateTime = AppDateTime().getUniLocalTimeFromUtcTime(lastEvent.startDateGmt);
+      startDateTime =
+          AppDateTime().getUniLocalTimeFromUtcTime(firstEvent.startDateGmt);
+      endDateTime =
+          AppDateTime().getUniLocalTimeFromUtcTime(lastEvent.startDateGmt);
     }
-    bool sameDay = ((startDateTime != null) && (endDateTime != null) && (startDateTime.year == endDateTime.year) &&
-        (startDateTime.month == endDateTime.month) && (startDateTime.day == endDateTime.day));
-    String startDateString = AppDateTime().getDisplayDay(dateTimeUtc: firstEvent.startDateGmt, allDay: firstEvent.allDay);
+    bool sameDay = ((startDateTime != null) &&
+        (endDateTime != null) &&
+        (startDateTime.year == endDateTime.year) &&
+        (startDateTime.month == endDateTime.month) &&
+        (startDateTime.day == endDateTime.day));
+    String startDateString = AppDateTime().getDisplayDay(
+        dateTimeUtc: firstEvent.startDateGmt, allDay: firstEvent.allDay);
     if (sameDay) {
       return startDateString;
     }
-    String endDateString = AppDateTime().getDisplayDay(dateTimeUtc: lastEvent.startDateGmt, allDay: lastEvent.allDay);
+    String endDateString = AppDateTime().getDisplayDay(
+        dateTimeUtc: lastEvent.startDateGmt, allDay: lastEvent.allDay);
     return '$startDateString - $endDateString';
   }
 
   String get displayInterests {
     String interests = "";
-    if(AppCollection.isCollectionNotEmpty(tags)) {
-      tags.forEach((String tag){
-          if(User().isTagged(tag, true)) {
-            if (interests.isNotEmpty) {
-              interests += ", ";
-            }
-            interests += tag;
+    if (AppCollection.isCollectionNotEmpty(tags)) {
+      tags.forEach((String tag) {
+        if (User().isTagged(tag, true)) {
+          if (interests.isNotEmpty) {
+            interests += ", ";
           }
+          interests += tag;
+        }
       });
     }
     return interests;
@@ -512,9 +558,13 @@ class Event with Explore implements Favorite {
     //create sports random image when athletics
     if ((category == "Athletics" || category == "Recreation") &&
         (registrationLabel != null && registrationLabel.isNotEmpty))
-      return Assets().randomStringFromListWithKey('images.random.sports.$registrationLabel') ?? '';
+      return Assets().randomStringFromListWithKey(
+              'images.random.sports.$registrationLabel') ??
+          '';
 
-    return Assets().randomStringFromListWithKey('images.random.events.$category') ?? '';
+    return Assets()
+            .randomStringFromListWithKey('images.random.events.$category') ??
+        '';
   }
 }
 
@@ -525,12 +575,12 @@ class Contact {
   String phone;
   String organization;
 
-  Contact({
-    this.firstName,
-    this.lastName,
-    this.email,
-    this.phone,
-    this.organization});
+  Contact(
+      {this.firstName,
+      this.lastName,
+      this.email,
+      this.phone,
+      this.organization});
 
   factory Contact.fromJson(Map<String, dynamic> json) {
     return Contact(
@@ -551,5 +601,3 @@ class Contact {
     };
   }
 }
-
-

@@ -28,16 +28,15 @@ import 'package:illinois/utils/Utils.dart';
 /// Explore
 
 abstract class Explore {
-
-  String   get exploreId;
-  String   get exploreTitle;
-  String   get exploreSubTitle;
-  String   get exploreShortDescription;
-  String   get exploreLongDescription;
-  String   get exploreImageURL;
-  String   get explorePlaceId;
+  String get exploreId;
+  String get exploreTitle;
+  String get exploreSubTitle;
+  String get exploreShortDescription;
+  String get exploreLongDescription;
+  String get exploreImageURL;
+  String get explorePlaceId;
   Location get exploreLocation;
-  Color    get uiColor;
+  Color get uiColor;
   Map<String, dynamic> get analyticsAttributes;
   Map<String, dynamic> toJson();
 
@@ -52,8 +51,7 @@ abstract class Explore {
   static Explore fromJson(Map<String, dynamic> json) {
     if (Event.canJson(json)) {
       return Event.fromJson(json);
-    }
-    else if (Dining.canJson(json)) {
+    } else if (Dining.canJson(json)) {
       return Dining.fromJson(json);
     }
     return null;
@@ -82,14 +80,12 @@ abstract class Explore {
     }
     return result;
   }
-
 }
 
 //////////////////////////////
 /// ExploreCategory
 
 class ExploreCategory {
-
   final String name;
   final List<String> subCategories;
 
@@ -97,44 +93,48 @@ class ExploreCategory {
 
   factory ExploreCategory.fromJson(Map<String, dynamic> json) {
     List<dynamic> subCategoriesData = json['subcategories'];
-    List<String> subCategoriesList = AppCollection.isCollectionNotEmpty(subCategoriesData) ? subCategoriesData.cast() : List<String>();
+    List<String> subCategoriesList =
+        AppCollection.isCollectionNotEmpty(subCategoriesData)
+            ? subCategoriesData.cast()
+            : List<String>();
     return ExploreCategory(
-      name: json['category'],
-      subCategories: subCategoriesList
-    );
+        name: json['category'], subCategories: subCategoriesList);
   }
 
-  toJson(){
-    return{
-      'category': name,
-      'subcategories': subCategories
-    };
+  toJson() {
+    return {'category': name, 'subcategories': subCategories};
   }
-
 }
 
 //////////////////////////////
 /// ExploreHelper
 
 class ExploreHelper {
-
-  static String getShortDisplayLocation(Explore explore, Core.LocationData locationData) {
+  static String getShortDisplayLocation(
+      Explore explore, Core.LocationData locationData) {
     if (explore != null) {
       Location location = explore.exploreLocation;
       if (location != null) {
-        if ((locationData != null) && (location.latitude != null) && (location.longitude != null)) {
-          double distance = AppLocation.distance(location.latitude, location.longitude, locationData.latitude, locationData.longitude);
+        if ((locationData != null) &&
+            (location.latitude != null) &&
+            (location.longitude != null)) {
+          double distance = AppLocation.distance(
+              location.latitude,
+              location.longitude,
+              locationData.latitude,
+              locationData.longitude);
           return distance.toStringAsFixed(1) + " mi away";
         }
         if ((location.description != null) && location.description.isNotEmpty) {
           return location.description;
         }
-        if ((location.name != null) && (explore.exploreTitle != null) && (location.name == explore.exploreTitle)) {
+        if ((location.name != null) &&
+            (explore.exploreTitle != null) &&
+            (location.name == explore.exploreTitle)) {
           if ((location.building != null) && location.building.isNotEmpty) {
             return location.building;
           }
-        }
-        else {
+        } else {
           String displayName = location.getDisplayName();
           if ((displayName != null) && displayName.isNotEmpty) {
             return displayName;
@@ -149,32 +149,44 @@ class ExploreHelper {
     return null;
   }
 
-  static String getLongDisplayLocation(Explore explore, Core.LocationData locationData) {
+  static String getLongDisplayLocation(
+      Explore explore, Core.LocationData locationData) {
     if (explore != null) {
       String displayText = "";
       Location location = explore.exploreLocation;
       if (location != null) {
-        if ((locationData != null) && (location.latitude != null) && (location.longitude != null)) {
-          double distance = AppLocation.distance(location.latitude, location.longitude, locationData.latitude, locationData.longitude);
+        if ((locationData != null) &&
+            (location.latitude != null) &&
+            (location.longitude != null)) {
+          double distance = AppLocation.distance(
+              location.latitude,
+              location.longitude,
+              locationData.latitude,
+              locationData.longitude);
           displayText = distance.toStringAsFixed(1) + " mi away";
         }
         if ((location.description != null) && location.description.isNotEmpty) {
-          return displayText += (displayText.isNotEmpty ? ", " : "")  + location.description;
+          return displayText +=
+              (displayText.isNotEmpty ? ", " : "") + location.description;
         }
-        if ((location.name != null) && (explore.exploreTitle != null) && (location.name == explore.exploreTitle)) {
+        if ((location.name != null) &&
+            (explore.exploreTitle != null) &&
+            (location.name == explore.exploreTitle)) {
           if ((location.building != null) && location.building.isNotEmpty) {
-            return displayText += (displayText.isNotEmpty ? ", " : "")  + location.building;
+            return displayText +=
+                (displayText.isNotEmpty ? ", " : "") + location.building;
           }
-        }
-        else {
+        } else {
           String displayName = location.getDisplayName();
           if ((displayName != null) && displayName.isNotEmpty) {
-            return displayText += (displayText.isNotEmpty ? ", " : "")  + displayName;
+            return displayText +=
+                (displayText.isNotEmpty ? ", " : "") + displayName;
           }
         }
         String displayAddress = location.getDisplayAddress();
         if ((displayAddress != null) && displayAddress.isNotEmpty) {
-          return displayText += (displayText.isNotEmpty ? ", " : "")  + displayAddress;
+          return displayText +=
+              (displayText.isNotEmpty ? ", " : "") + displayAddress;
         }
       }
     }
@@ -188,8 +200,7 @@ class ExploreHelper {
         String exploreType = explore.runtimeType.toString().toLowerCase();
         if (exploresType == null) {
           exploresType = exploreType;
-        }
-        else if (exploresType != exploreType) {
+        } else if (exploresType != exploreType) {
           exploresType = null;
           break;
         }
@@ -197,16 +208,17 @@ class ExploreHelper {
     }
 
     if (exploresType == "event") {
-      return Localization().getStringEx('panel.explore.item.events.name', 'Events');
-    }
-    else if (exploresType == "dining") {
-      return Localization().getStringEx('panel.explore.item.dinings.name', 'Dinings');
-    }
-    else if (exploresType == "place") {
-      return Localization().getStringEx('panel.explore.item.places.name', 'Places');
-    }
-    else {
-      return Localization().getStringEx('panel.explore.item.unknown.name', 'Explores');
+      return Localization()
+          .getStringEx('panel.explore.item.events.name', 'Events');
+    } else if (exploresType == "dining") {
+      return Localization()
+          .getStringEx('panel.explore.item.dinings.name', 'Dinings');
+    } else if (exploresType == "place") {
+      return Localization()
+          .getStringEx('panel.explore.item.places.name', 'Places');
+    } else {
+      return Localization()
+          .getStringEx('panel.explore.item.unknown.name', 'Explores');
     }
   }
 }
