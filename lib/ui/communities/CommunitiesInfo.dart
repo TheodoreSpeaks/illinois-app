@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'CommunityExploreCard.dart';
 
 class CommunityInfoPage extends StatelessWidget {
+  final String title = 'BNAACC';
   final json = [
     {
       'id': '1',
@@ -54,7 +55,7 @@ class CommunityInfoPage extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => CallPage(
-          channelName: 'communities',
+          channelName: title,
           role: ClientRole.Broadcaster,
         ),
       ),
@@ -70,7 +71,7 @@ class CommunityInfoPage extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            "BNAACC",
+            title,
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
