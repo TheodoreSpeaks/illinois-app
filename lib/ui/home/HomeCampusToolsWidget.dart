@@ -28,6 +28,7 @@ import 'package:illinois/service/Localization.dart';
 import 'package:illinois/service/NotificationService.dart';
 import 'package:illinois/ui/WebPanel.dart';
 import 'package:illinois/ui/athletics/AthleticsHomePanel.dart';
+import 'package:illinois/ui/communities/CommunitiesWidget.dart';
 import 'package:illinois/ui/explore/ExplorePanel.dart';
 import 'package:illinois/ui/laundry/LaundryHomePanel.dart';
 import 'package:illinois/ui/settings/SettingsIlliniCashPanel.dart';
@@ -36,12 +37,11 @@ import 'package:illinois/ui/widgets/SectionTitlePrimary.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeCampusToolsWidget extends StatefulWidget {
-
   _HomeCampusToolsWidgetState createState() => _HomeCampusToolsWidgetState();
 }
 
-class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget> implements NotificationsListener {
-
+class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget>
+    implements NotificationsListener {
   List<dynamic> _contentListCodes;
 
   @override
@@ -52,6 +52,8 @@ class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget> implement
     ]);
 
     _contentListCodes = FlexUI()['campus_tools'] ?? [];
+    _contentListCodes.add('communities');
+    print('CONTENT: $_contentListCodes');
     super.initState();
   }
 
@@ -65,49 +67,70 @@ class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget> implement
     String label, hint, iconPath;
     GestureTapCallback onTap;
     if (code == 'events') {
-      label = Localization().getStringEx('widget.home_campus_tools.button.events.title', 'Events');
-      hint = Localization().getStringEx('widget.home_campus_tools.button.events.hint', '');
+      label = Localization().getStringEx(
+          'widget.home_campus_tools.button.events.title', 'Events');
+      hint = Localization()
+          .getStringEx('widget.home_campus_tools.button.events.hint', '');
       iconPath = 'images/icon-campus-tools-events.png';
       onTap = _onTapEvents;
-    }
-    else if (code == 'dining') {
-      label = Localization().getStringEx('widget.home_campus_tools.button.dining.title', 'Dining');
-      hint = Localization().getStringEx('widget.home_campus_tools.button.dining.hint', '');
+    } else if (code == 'dining') {
+      label = Localization().getStringEx(
+          'widget.home_campus_tools.button.dining.title', 'Dining');
+      hint = Localization()
+          .getStringEx('widget.home_campus_tools.button.dining.hint', '');
       iconPath = 'images/icon-campus-tools-dining.png';
       onTap = _onTapDining;
-    }
-    else if (code == 'athletics') {
-      label = Localization().getStringEx('widget.home_campus_tools.button.athletics.title', 'Athletics');
-      hint = Localization().getStringEx('widget.home_campus_tools.button.athletics.hint', '');
+    } else if (code == 'athletics') {
+      label = Localization().getStringEx(
+          'widget.home_campus_tools.button.athletics.title', 'Athletics');
+      hint = Localization()
+          .getStringEx('widget.home_campus_tools.button.athletics.hint', '');
       iconPath = 'images/icon-campus-tools-athletics.png';
       onTap = _onTapAthletics;
-    }
-    else if (code == 'laundry') {
-      label = Localization().getStringEx('widget.home_campus_tools.button.laundry.title', 'Laundry');
-      hint = Localization().getStringEx('widget.home_campus_tools.button.laundry.hint', '');
+    } else if (code == 'laundry') {
+      label = Localization().getStringEx(
+          'widget.home_campus_tools.button.laundry.title', 'Laundry');
+      hint = Localization()
+          .getStringEx('widget.home_campus_tools.button.laundry.hint', '');
       iconPath = 'images/icon-campus-tools-laundry.png';
       onTap = _onTapLaundry;
-    }
-    else if (code == 'illini_cash') {
-      label = Localization().getStringEx('widget.home_campus_tools.button.illini_cash.title', 'Illini Cash');
-      hint = Localization().getStringEx('widget.home_campus_tools.button.illini_cash.hint', '');
+    } else if (code == 'illini_cash') {
+      label = Localization().getStringEx(
+          'widget.home_campus_tools.button.illini_cash.title', 'Illini Cash');
+      hint = Localization()
+          .getStringEx('widget.home_campus_tools.button.illini_cash.hint', '');
       iconPath = 'images/icon-campus-tools-illini-cash.png';
       onTap = _onTapIlliniCash;
     } else if (code == 'my_illini') {
-      label = Localization().getStringEx('widget.home_campus_tools.button.my_illini.title', 'My Illini');
-      hint = Localization().getStringEx('widget.home_campus_tools.button.my_illini.hint', '');
+      label = Localization().getStringEx(
+          'widget.home_campus_tools.button.my_illini.title', 'My Illini');
+      hint = Localization()
+          .getStringEx('widget.home_campus_tools.button.my_illini.hint', '');
       iconPath = 'images/my-illini-orange.png';
       onTap = _onTapMyIllini;
-     } else {
+    } else if (code == "communities") {
+      label = 'Communities';
+      hint = 'communities';
+      iconPath = 'images/icon-campus-tools-athletics.png';
+      onTap = _onTapCommunities;
+    } else {
       return null;
     }
 
     if (countPerRow == 1) {
-      return Expanded(child: LinkTileWideButton(label: label, hint: hint, iconPath: iconPath, onTap: onTap));
-    }
-    else {
-      double width = (0 < countPerRow) ? (MediaQuery.of(context).size.width / countPerRow - 20) : 200;
-      return LinkTileSmallButton(width: width, label: label, hint: hint, iconPath: iconPath, onTap: onTap);
+      return Expanded(
+          child: LinkTileWideButton(
+              label: label, hint: hint, iconPath: iconPath, onTap: onTap));
+    } else {
+      double width = (0 < countPerRow)
+          ? (MediaQuery.of(context).size.width / countPerRow - 20)
+          : 200;
+      return LinkTileSmallButton(
+          width: width,
+          label: label,
+          hint: hint,
+          iconPath: iconPath,
+          onTap: onTap);
     }
   }
 
@@ -137,17 +160,24 @@ class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget> implement
     }
     return Column(
       children: <Widget>[
-        SectionTitlePrimary(title: Localization().getStringEx('widget.home_campus_tools.label.campus_tools', 'Campus Resources'),
+        SectionTitlePrimary(
+          title: Localization().getStringEx(
+              'widget.home_campus_tools.label.campus_tools',
+              'Campus Resources'),
           iconPath: 'images/campus-tools.png',
-          children: rows,),
-        Container(height: 48,),
+          children: rows,
+        ),
+        Container(
+          height: 48,
+        ),
       ],
     );
   }
 
   void _updateContentListCodes() {
     List<dynamic> contentListCodes = FlexUI()['campus_tools'];
-    if ((contentListCodes != null) ?? !DeepCollectionEquality().equals(_contentListCodes, contentListCodes)) {
+    if ((contentListCodes != null) ??
+        !DeepCollectionEquality().equals(_contentListCodes, contentListCodes)) {
       setState(() {
         _contentListCodes = contentListCodes;
       });
@@ -159,36 +189,56 @@ class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget> implement
   void onNotification(String name, dynamic param) {
     if (name == Connectivity.notifyStatusChanged) {
       _updateContentListCodes();
-    }
-    else if (name == FlexUI.notifyChanged) {
+    } else if (name == FlexUI.notifyChanged) {
       _updateContentListCodes();
     }
   }
 
   void _onTapEvents() {
     Analytics.instance.logSelect(target: "Events");
-    Navigator.push(context, CupertinoPageRoute(builder: (context) { return ExplorePanel(initialTab: ExploreTab.Events, showHeaderBack: true,); } ));
+    Navigator.push(context, CupertinoPageRoute(builder: (context) {
+      return ExplorePanel(
+        initialTab: ExploreTab.Events,
+        showHeaderBack: true,
+      );
+    }));
   }
-    
+
+  void _onTapCommunities() {
+    Navigator.push(context, CupertinoPageRoute(builder: (context) {
+      return CommunitiesPage();
+    }));
+  }
+
   void _onTapDining() {
     Analytics.instance.logSelect(target: "Dinings");
-    Navigator.push(context, CupertinoPageRoute(builder: (context) { return ExplorePanel(initialTab: ExploreTab.Dining, showHeaderBack: true,); } ));
+    Navigator.push(context, CupertinoPageRoute(builder: (context) {
+      return ExplorePanel(
+        initialTab: ExploreTab.Dining,
+        showHeaderBack: true,
+      );
+    }));
   }
 
   void _onTapAthletics() {
     Analytics.instance.logSelect(target: "Athletics");
-    Navigator.push(context, CupertinoPageRoute(builder: (context) => AthleticsHomePanel()));
+    Navigator.push(context,
+        CupertinoPageRoute(builder: (context) => AthleticsHomePanel()));
   }
 
   void _onTapLaundry() {
     Analytics.instance.logSelect(target: "Laundry");
-    Navigator.push(context, CupertinoPageRoute(builder: (context) => LaundryHomePanel()));
+    Navigator.push(
+        context, CupertinoPageRoute(builder: (context) => LaundryHomePanel()));
   }
 
   void _onTapIlliniCash() {
     Analytics.instance.logSelect(target: "Illini Cash");
     Navigator.push(
-        context, CupertinoPageRoute(settings: RouteSettings(name: SettingsIlliniCashPanel.routeName), builder: (context) => SettingsIlliniCashPanel()));
+        context,
+        CupertinoPageRoute(
+            settings: RouteSettings(name: SettingsIlliniCashPanel.routeName),
+            builder: (context) => SettingsIlliniCashPanel()));
   }
 
   void _onTapMyIllini() {
@@ -206,11 +256,15 @@ class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget> implement
       //
       if (Platform.isAndroid) {
         launch(Config().myIlliniUrl);
-      }
-      else {
-        Navigator.push(context, CupertinoPageRoute(builder: (context) => WebPanel(url: Config().myIlliniUrl, title: myIlliniPanelTitle,)));
+      } else {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => WebPanel(
+                      url: Config().myIlliniUrl,
+                      title: myIlliniPanelTitle,
+                    )));
       }
     }
   }
 }
-

@@ -50,16 +50,22 @@ import 'package:illinois/utils/Utils.dart';
 import 'package:illinois/service/Styles.dart';
 import 'package:illinois/ui/athletics/AthleticsGameDetailPanel.dart';
 
-enum ExploreTab { All, NearMe, Events, Dining }
+enum ExploreTab { All, NearMe, Events, Dining, Communities }
 
-enum ExploreFilterType { categories, event_time, event_tags, payment_type, work_time }
+enum ExploreFilterType {
+  categories,
+  event_time,
+  event_tags,
+  payment_type,
+  work_time
+}
 
 class _PanelData {
-  ExplorePanelState         _panelState;
-  ExploreTab                _selectedTab;
-  ExploreFilter             _selectedFilter;
-  bool                      _showHeaderBack;
-  bool                      _showTabBar;
+  ExplorePanelState _panelState;
+  ExploreTab _selectedTab;
+  ExploreFilter _selectedFilter;
+  bool _showHeaderBack;
+  bool _showTabBar;
 }
 
 class _ExploreSortKey extends OrdinalSortKey {
@@ -70,18 +76,26 @@ class _ExploreSortKey extends OrdinalSortKey {
 }
 
 class ExplorePanel extends StatefulWidget {
-
   final _PanelData _data = _PanelData();
 
-  ExplorePanel({ExploreTab initialTab = ExploreTab.Events, ExploreFilter initialFilter, bool showHeaderBack = true, bool showTabBar = true }){
+  ExplorePanel(
+      {ExploreTab initialTab = ExploreTab.Events,
+      ExploreFilter initialFilter,
+      bool showHeaderBack = true,
+      bool showTabBar = true}) {
     _data._selectedTab = initialTab;
     _data._showHeaderBack = showHeaderBack;
     _data._selectedFilter = initialFilter;
     _data._showTabBar = showTabBar;
   }
 
-  void selectTab(ExploreTab tab, {ExploreFilter initialFilter, bool showHeaderBack = false, bool showTabBar = true}) {
-    if ((_data._panelState != null) && _data._panelState.mounted  && (tab != null)) {
+  void selectTab(ExploreTab tab,
+      {ExploreFilter initialFilter,
+      bool showHeaderBack = false,
+      bool showTabBar = true}) {
+    if ((_data._panelState != null) &&
+        _data._panelState.mounted &&
+        (tab != null)) {
       _data._panelState.selectTab(tab, initialFilter: initialFilter);
     } else {
       _data._selectedTab = tab;
@@ -91,22 +105,35 @@ class ExplorePanel extends StatefulWidget {
     }
   }
 
-  static Future<void> presentDetailPanel(BuildContext context, {String eventId}) async {
-    List<Event> events = (eventId != null) ? await ExploreService().loadEventsByIds(Set.from([eventId])) : null;
-    Event event = ((events != null) && (0 < events.length)) ? events.first : null;
+  static Future<void> presentDetailPanel(BuildContext context,
+      {String eventId}) async {
+    List<Event> events = (eventId != null)
+        ? await ExploreService().loadEventsByIds(Set.from([eventId]))
+        : null;
+    Event event =
+        ((events != null) && (0 < events.length)) ? events.first : null;
     //Explore explore = (eventId != null) ? await ExploreService().getEventById(eventId) : null;
     //Event event = (explore is Event) ? explore : null;
     if (event != null) {
       if (event.isComposite ?? false) {
-        Navigator.push(context, CupertinoPageRoute(builder: (context) => CompositeEventsDetailPanel(parentEvent: event)));
-      }
-      else if (event.isGameEvent ?? false) {
-        Navigator.push(context, CupertinoPageRoute(builder: (context) =>
-            AthleticsGameDetailPanel(gameId: event.speaker, sportName: event.registrationLabel,)));
-      }
-      else {
-        Navigator.push(context, CupertinoPageRoute(builder: (context) =>
-          ExploreDetailPanel(explore: event)));
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) =>
+                    CompositeEventsDetailPanel(parentEvent: event)));
+      } else if (event.isGameEvent ?? false) {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => AthleticsGameDetailPanel(
+                      gameId: event.speaker,
+                      sportName: event.registrationLabel,
+                    )));
+      } else {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => ExploreDetailPanel(explore: event)));
       }
     }
   }
@@ -122,22 +149,21 @@ class ExplorePanelState extends State<ExplorePanel>
         SingleTickerProviderStateMixin,
         AutomaticKeepAliveClientMixin<ExplorePanel>
     implements NotificationsListener, RoundedTabListener {
-  
   List<ExploreTab> _exploreTabs = [];
-  ExploreTab    _selectedTab;
+  ExploreTab _selectedTab;
 
   List<dynamic> _eventCategories;
   List<Explore> _displayExplores;
-  List<String>  _filterWorkTimeValues;
-  List<String>  _filterPaymentTypeValues;
-  List<String>  _filterEventTimeValues;
-  
+  List<String> _filterWorkTimeValues;
+  List<String> _filterPaymentTypeValues;
+  List<String> _filterEventTimeValues;
+
   LocationData _locationData;
   LocationServicesStatus _locationServicesStatus;
 
   ExploreFilter _initialSelectedFilter;
-  bool          _showHeaderBack = true;
-  bool          _showTabBar = true;
+  bool _showHeaderBack = true;
+  bool _showTabBar = true;
   Map<ExploreTab, List<ExploreFilter>> _tabToFilterMap;
   bool _filterOptionsVisible = false;
 
@@ -146,7 +172,6 @@ class ExplorePanelState extends State<ExplorePanel>
   ScrollController _scrollController = ScrollController();
 
   Future<List<Explore>> _loadingTask;
-  
 
   // When we click item[index == 2] -the TabBar creates and immediately dispose item[index == 1] (But _state.mounted = true)
   // as a result the ExplorePanel.panelState loses its _element so we need to recreate the panel(as workaround)
@@ -183,7 +208,11 @@ class ExplorePanelState extends State<ExplorePanel>
     _initTabs();
     _initFilters();
     _loadEventCategories();
-    _mapExploreBarAnimationController = AnimationController (duration: Duration(milliseconds: 200), lowerBound: -MapBarHeight, upperBound: 0, vsync: this)
+    _mapExploreBarAnimationController = AnimationController(
+        duration: Duration(milliseconds: 200),
+        lowerBound: -MapBarHeight,
+        upperBound: 0,
+        vsync: this)
       ..addListener(() {
         this._refresh(() {});
       });
@@ -206,14 +235,15 @@ class ExplorePanelState extends State<ExplorePanel>
   @override
   bool get wantKeepAlive => true;
 
-  bool get _hasDiningSpecials{
+  bool get _hasDiningSpecials {
     return _diningSpecials != null && _diningSpecials.isNotEmpty;
   }
 
-  int get _exploresCount{
-    int exploresCount = (_displayExplores != null) ? _displayExplores.length : 0;
+  int get _exploresCount {
+    int exploresCount =
+        (_displayExplores != null) ? _displayExplores.length : 0;
 
-    if(_hasDiningSpecials){
+    if (_hasDiningSpecials) {
       exploresCount++;
     }
     return exploresCount;
@@ -244,7 +274,8 @@ class ExplorePanelState extends State<ExplorePanel>
               displayType: _displayType,
               searchVisible: (_selectedTab != ExploreTab.Dining),
               onTapList: () => _selectDisplayType(ListMapDisplayType.List),
-              onTapMap: () => _selectDisplayType(ListMapDisplayType.Map),),
+              onTapMap: () => _selectDisplayType(ListMapDisplayType.Map),
+            ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Padding(
@@ -253,76 +284,75 @@ class ExplorePanelState extends State<ExplorePanel>
                     children: _buildTabWidgets(),
                   )),
             ),
-              Expanded(
-                child: Stack(
-                  children: <Widget>[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: 12, right: 12, bottom: 12),
-                              child: Row(
-                                children: _buildFilterWidgets(),
-                              )),
-                        ),
-                        Expanded(
-                            child: Container(
-                          color: Styles().colors.background,
-                          child: Center(
-                            child: Stack(
-                              children: <Widget>[
-                                _buildMapView(context),
-                                _buildListView(),
-                                _buildDimmedContainer()
-                              ],
-                            ),
+            Expanded(
+              child: Stack(
+                children: <Widget>[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Padding(
+                            padding: EdgeInsets.only(
+                                left: 12, right: 12, bottom: 12),
+                            child: Row(
+                              children: _buildFilterWidgets(),
+                            )),
+                      ),
+                      Expanded(
+                          child: Container(
+                        color: Styles().colors.background,
+                        child: Center(
+                          child: Stack(
+                            children: <Widget>[
+                              _buildMapView(context),
+                              _buildListView(),
+                              _buildDimmedContainer()
+                            ],
                           ),
-                        ))
-                      ],
-                    ),
-                    _buildFilterValuesContainer()
-                  ],
-                ),
-              )
-            ]),
-            backgroundColor: Styles().colors.background,
-            bottomNavigationBar: _showTabBar ? TabBarWidget() : null,
-          );
-
+                        ),
+                      ))
+                    ],
+                  ),
+                  _buildFilterValuesContainer()
+                ],
+              ),
+            )
+          ]),
+      backgroundColor: Styles().colors.background,
+      bottomNavigationBar: _showTabBar ? TabBarWidget() : null,
+    );
   }
 
   void _initTabs() {
     if (User().privacyMatch(2)) {
-      LocationServices.instance.status.then((LocationServicesStatus locationServicesStatus) {
+      LocationServices.instance.status
+          .then((LocationServicesStatus locationServicesStatus) {
         _locationServicesStatus = locationServicesStatus;
 
-        if (_locationServicesStatus == LocationServicesStatus.PermissionNotDetermined) {
-          LocationServices.instance.requestPermission().then((LocationServicesStatus locationServicesStatus) {
+        if (_locationServicesStatus ==
+            LocationServicesStatus.PermissionNotDetermined) {
+          LocationServices.instance
+              .requestPermission()
+              .then((LocationServicesStatus locationServicesStatus) {
             _locationServicesStatus = locationServicesStatus;
             _updateTabs();
           });
-        }
-        else {
+        } else {
           _updateTabs();
         }
       });
-    }
-    else {
-        _updateTabs();
+    } else {
+      _updateTabs();
     }
   }
 
   void _updateTabs() {
-
     List<ExploreTab> exploreTabs = [];
 
     if (_userLocationEnabled()) {
       exploreTabs.add(ExploreTab.NearMe);
-    }
-    else {
+    } else {
       // We would like you to "omit it" (point 3.3.2).
       // exploreTabs.add(ExploreTab.All);
     }
@@ -334,8 +364,7 @@ class ExplorePanelState extends State<ExplorePanel>
 
       if (!_exploreTabs.contains(_selectedTab)) {
         selectTab(_exploreTabs[0]);
-      }
-      else {
+      } else {
         _loadExplores();
       }
     }
@@ -344,7 +373,8 @@ class ExplorePanelState extends State<ExplorePanel>
   }
 
   bool _userLocationEnabled() {
-    return User().privacyMatch(2) && (_locationServicesStatus == LocationServicesStatus.PermissionAllowed);
+    return User().privacyMatch(2) &&
+        (_locationServicesStatus == LocationServicesStatus.PermissionAllowed);
   }
 
   void _initFilters() {
@@ -370,23 +400,31 @@ class ExplorePanelState extends State<ExplorePanel>
     };
 
     _filterEventTimeValues = [
-      Localization().getStringEx('panel.explore.filter.time.upcoming', 'Upcoming'),
+      Localization()
+          .getStringEx('panel.explore.filter.time.upcoming', 'Upcoming'),
       Localization().getStringEx('panel.explore.filter.time.today', 'Today'),
-      Localization().getStringEx('panel.explore.filter.time.next_7_days', 'Next 7 days'),
-      Localization().getStringEx('panel.explore.filter.time.this_weekend', 'This Weekend'),
-      Localization().getStringEx('panel.explore.filter.time.this_month', 'Next 30 days'),
+      Localization()
+          .getStringEx('panel.explore.filter.time.next_7_days', 'Next 7 days'),
+      Localization().getStringEx(
+          'panel.explore.filter.time.this_weekend', 'This Weekend'),
+      Localization()
+          .getStringEx('panel.explore.filter.time.this_month', 'Next 30 days'),
     ];
 
     _filterPaymentTypeValues = [
-      Localization().getStringEx('panel.explore.filter.payment_types.all', 'All Payment Types')  
+      Localization().getStringEx(
+          'panel.explore.filter.payment_types.all', 'All Payment Types')
     ];
     for (PaymentType paymentType in PaymentType.values) {
-      _filterPaymentTypeValues.add(PaymentTypeHelper.paymentTypeToDisplayString(paymentType));
+      _filterPaymentTypeValues
+          .add(PaymentTypeHelper.paymentTypeToDisplayString(paymentType));
     }
 
     _filterWorkTimeValues = [
-      Localization().getStringEx('panel.explore.filter.worktimes.all', 'All Locations'),
-      Localization().getStringEx('panel.explore.filter.worktimes.open_now', 'Open Now'),
+      Localization()
+          .getStringEx('panel.explore.filter.worktimes.all', 'All Locations'),
+      Localization()
+          .getStringEx('panel.explore.filter.worktimes.open_now', 'Open Now'),
     ];
   }
 
@@ -405,32 +443,29 @@ class ExplorePanelState extends State<ExplorePanel>
     String dateFormat = AppDateTime.eventFilterDisplayDateFormat;
     DateTime now = DateTime.now();
     String todayDateLabel = AppDateTime()
-        .formatDateTime(now, format: dateFormat,
-        ignoreTimeZone: true);
+        .formatDateTime(now, format: dateFormat, ignoreTimeZone: true);
 
     //Next 7 days
-    String next7DaysEnd = '${AppDateTime()
-        .formatDateTime(now.add(Duration(days: 6)), format: dateFormat,
-        ignoreTimeZone: true)}';
+    String next7DaysEnd =
+        '${AppDateTime().formatDateTime(now.add(Duration(days: 6)), format: dateFormat, ignoreTimeZone: true)}';
     String next7DaysLabel = '$todayDateLabel - $next7DaysEnd';
 
     //This weekend
     int currentWeekDay = now.weekday;
-    DateTime weekendStartDate = DateTime(
-        now.year, now.month, now.day, 0, 0, 0)
+    DateTime weekendStartDate = DateTime(now.year, now.month, now.day, 0, 0, 0)
         .add(Duration(days: (6 - currentWeekDay)));
-    DateTime weekendEndDate = weekendStartDate.add(
-        Duration(days: 1, hours: 23, minutes: 59, seconds: 59));
-    String weekendStartLabel = AppDateTime().formatDateTime(
-        weekendStartDate, format: dateFormat,
-        ignoreTimeZone: true);
-    String weekendEndLabel = AppDateTime().formatDateTime(
-        weekendEndDate, format: dateFormat, ignoreTimeZone: true);
+    DateTime weekendEndDate = weekendStartDate
+        .add(Duration(days: 1, hours: 23, minutes: 59, seconds: 59));
+    String weekendStartLabel = AppDateTime().formatDateTime(weekendStartDate,
+        format: dateFormat, ignoreTimeZone: true);
+    String weekendEndLabel = AppDateTime().formatDateTime(weekendEndDate,
+        format: dateFormat, ignoreTimeZone: true);
     String weekendLabel = '$weekendStartLabel - $weekendEndLabel';
 
     //Next 30 days
-    String next30DaysEndLabel = AppDateTime()
-        .formatDateTime(now.add(Duration(days: 30)), format: dateFormat,
+    String next30DaysEndLabel = AppDateTime().formatDateTime(
+        now.add(Duration(days: 30)),
+        format: dateFormat,
         ignoreTimeZone: true);
     String next30DaysLabel = '$todayDateLabel - $next30DaysEndLabel';
 
@@ -445,8 +480,10 @@ class ExplorePanelState extends State<ExplorePanel>
 
   List<String> _getFilterCategoriesValues() {
     List<String> categoriesValues = List();
-    categoriesValues.add(Localization().getStringEx('panel.explore.filter.categories.all', 'All Categories'));
-    categoriesValues.add(Localization().getStringEx('panel.explore.filter.categories.my', 'My Categories'));
+    categoriesValues.add(Localization()
+        .getStringEx('panel.explore.filter.categories.all', 'All Categories'));
+    categoriesValues.add(Localization()
+        .getStringEx('panel.explore.filter.categories.my', 'My Categories'));
     if (_eventCategories != null) {
       for (var category in _eventCategories) {
         categoriesValues.add(category['category']);
@@ -457,47 +494,54 @@ class ExplorePanelState extends State<ExplorePanel>
 
   List<String> _getFilterTagsValues() {
     List<String> tagsValues = List();
-    tagsValues.add(Localization().getStringEx('panel.explore.filter.tags.all', 'All Tags'));
-    tagsValues.add(Localization().getStringEx('panel.explore.filter.tags.my', 'My Tags'));
+    tagsValues.add(Localization()
+        .getStringEx('panel.explore.filter.tags.all', 'All Tags'));
+    tagsValues.add(
+        Localization().getStringEx('panel.explore.filter.tags.my', 'My Tags'));
     return tagsValues;
   }
 
   void _loadExplores() {
-
     _diningSpecials = null;
 
     _selectMapExplore(null);
 
     Future<List<Explore>> task;
     if (Connectivity().isNotOffline) {
-
-      List<ExploreFilter> selectedFilterList = (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
+      List<ExploreFilter> selectedFilterList =
+          (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
       switch (_selectedTab) {
-        
         case ExploreTab.All:
           task = _loadAll(selectedFilterList);
           break;
-        
+
         case ExploreTab.NearMe:
           task = _loadNearMe(selectedFilterList);
           break;
-        
-        case ExploreTab.Events: 
+
+        case ExploreTab.Events:
           {
             if (_initialSelectedFilter != null) {
-              ExploreFilter filter = (AppCollection.isCollectionNotEmpty(selectedFilterList)) ? selectedFilterList.firstWhere((selectedFilter) =>
-              selectedFilter.type == _initialSelectedFilter.type) : null;
+              ExploreFilter filter =
+                  (AppCollection.isCollectionNotEmpty(selectedFilterList))
+                      ? selectedFilterList.firstWhere((selectedFilter) =>
+                          selectedFilter.type == _initialSelectedFilter.type)
+                      : null;
               if (filter != null) {
                 int filterIndex = selectedFilterList.indexOf(filter);
                 selectedFilterList.remove(filter);
-                selectedFilterList.insert(filterIndex, ExploreFilter(
-                    type: _initialSelectedFilter.type, selectedIndexes: _initialSelectedFilter.selectedIndexes, active: _initialSelectedFilter.active));
+                selectedFilterList.insert(
+                    filterIndex,
+                    ExploreFilter(
+                        type: _initialSelectedFilter.type,
+                        selectedIndexes: _initialSelectedFilter.selectedIndexes,
+                        active: _initialSelectedFilter.active));
               }
             }
             task = _loadEvents(selectedFilterList);
             break;
           }
-        
+
         case ExploreTab.Dining:
           task = _loadDining(selectedFilterList);
           break;
@@ -513,52 +557,77 @@ class ExplorePanelState extends State<ExplorePanel>
           }
         });
       });
-    }
-    else {
+    } else {
       _applyExplores(null);
     }
   }
 
   void _applyExplores(List<Explore> explores) {
     _refresh(() {
-        _loadingTask = null;
-        _displayExplores = explores;
-        _placeExploresOnMap(_displayExplores);
-      });
+      _loadingTask = null;
+      _displayExplores = explores;
+      _placeExploresOnMap(_displayExplores);
+    });
   }
 
   Future<List<Explore>> _loadAll(List<ExploreFilter> selectedFilterList) async {
     Set<String> categories = _getSelectedCategories(selectedFilterList);
-    return ExploreService().loadEvents(categories: categories, startDate: AppDateTime().now);
+    return ExploreService()
+        .loadEvents(categories: categories, startDate: AppDateTime().now);
   }
 
-  Future<List<Explore>> _loadNearMe(List<ExploreFilter> selectedFilterList) async {
+  Future<List<Explore>> _loadNearMe(
+      List<ExploreFilter> selectedFilterList) async {
     Set<String> categories = _getSelectedCategories(selectedFilterList);
     List<String> tags = _getSelectedEventTags(selectedFilterList);
-    Map<String, DateTime> period = _getSelectedEventTimePeriod(selectedFilterList);
-    _locationData = _userLocationEnabled() ? await LocationServices.instance.location : null;
-    return (_locationData != null) ? ExploreService().loadEvents(locationData: _locationData, categories: categories, tags: tags?.toSet(), startDate: period['start_date'], startDateLimit: period['end_date']) : null;
+    Map<String, DateTime> period =
+        _getSelectedEventTimePeriod(selectedFilterList);
+    _locationData = _userLocationEnabled()
+        ? await LocationServices.instance.location
+        : null;
+    return (_locationData != null)
+        ? ExploreService().loadEvents(
+            locationData: _locationData,
+            categories: categories,
+            tags: tags?.toSet(),
+            startDate: period['start_date'],
+            startDateLimit: period['end_date'])
+        : null;
   }
 
-  Future<List<Explore>> _loadEvents(List<ExploreFilter> selectedFilterList) async {
+  Future<List<Explore>> _loadEvents(
+      List<ExploreFilter> selectedFilterList) async {
     Set<String> categories = _getSelectedCategories(selectedFilterList);
     List<String> tags = _getSelectedEventTags(selectedFilterList);
-    Map<String, DateTime> period = _getSelectedEventTimePeriod(selectedFilterList);
-    return ExploreService().loadEvents(categories: categories, tags: tags?.toSet(), startDate: period['start_date'], startDateLimit: period['end_date']);
+    Map<String, DateTime> period =
+        _getSelectedEventTimePeriod(selectedFilterList);
+    return ExploreService().loadEvents(
+        categories: categories,
+        tags: tags?.toSet(),
+        startDate: period['start_date'],
+        startDateLimit: period['end_date']);
   }
 
-  Future<List<Explore>> _loadDining(List<ExploreFilter> selectedFilterList) async {
+  Future<List<Explore>> _loadDining(
+      List<ExploreFilter> selectedFilterList) async {
     String workTime = _getSelectedWorkTime(selectedFilterList);
     PaymentType paymentType = _getSelectedPaymentType(selectedFilterList);
-    bool onlyOpened = (AppCollection.isCollectionNotEmpty(_filterWorkTimeValues)) ? (_filterWorkTimeValues[1] == workTime) : false;
+    bool onlyOpened =
+        (AppCollection.isCollectionNotEmpty(_filterWorkTimeValues))
+            ? (_filterWorkTimeValues[1] == workTime)
+            : false;
 
-    _locationData = _userLocationEnabled() ? await LocationServices.instance.location : null;
+    _locationData = _userLocationEnabled()
+        ? await LocationServices.instance.location
+        : null;
     _diningSpecials = await DiningService().loadDiningSpecials();
 
-    return DiningService().loadBackendDinings(onlyOpened, paymentType, _locationData);
+    return DiningService()
+        .loadBackendDinings(onlyOpened, paymentType, _locationData);
   }
 
-  Set<int> _getSelectedFilterIndexes(List<ExploreFilter> selectedFilterList, ExploreFilterType filterType) {
+  Set<int> _getSelectedFilterIndexes(
+      List<ExploreFilter> selectedFilterList, ExploreFilterType filterType) {
     if (selectedFilterList != null) {
       for (ExploreFilter selectedFilter in selectedFilterList) {
         if (selectedFilter.type == filterType) {
@@ -578,12 +647,14 @@ class ExplorePanelState extends State<ExplorePanel>
       //Apply custom logic for categories
       if (selectedFilter.type == ExploreFilterType.categories) {
         Set<int> selectedIndexes = selectedFilter.selectedIndexes;
-        if (selectedIndexes == null || selectedIndexes.isEmpty ||
+        if (selectedIndexes == null ||
+            selectedIndexes.isEmpty ||
             selectedIndexes.contains(0)) {
           break; //All Categories
         } else {
           selectedCategories = Set();
-          if (selectedIndexes.contains(1)) { //My categories
+          if (selectedIndexes.contains(1)) {
+            //My categories
             List<String> userCategories = User().getInterestsCategories();
             if (userCategories != null && userCategories.isNotEmpty) {
               selectedCategories.addAll(userCategories.toSet());
@@ -595,7 +666,8 @@ class ExplorePanelState extends State<ExplorePanel>
             for (int selectedCategoryIndex in selectedIndexes) {
               if ((selectedCategoryIndex < filterCategoriesValues.length) &&
                   selectedCategoryIndex != 1) {
-                String singleCategory = filterCategoriesValues[selectedCategoryIndex];
+                String singleCategory =
+                    filterCategoriesValues[selectedCategoryIndex];
                 if (AppString.isStringNotEmpty(singleCategory)) {
                   selectedCategories.add(singleCategory);
                 }
@@ -608,42 +680,44 @@ class ExplorePanelState extends State<ExplorePanel>
     return selectedCategories;
   }
 
-  Map<String,DateTime> _getSelectedEventTimePeriod(List<ExploreFilter> selectedFilterList) {
-    
+  Map<String, DateTime> _getSelectedEventTimePeriod(
+      List<ExploreFilter> selectedFilterList) {
     DateTime now = AppDateTime().now;
     DateTime startDate = now, endDate;
-    Set<int> selectedIndexes = _getSelectedFilterIndexes(selectedFilterList, ExploreFilterType.event_time);
-    int index = (selectedIndexes != null && selectedIndexes.isNotEmpty) ? selectedIndexes.first : -1; //Get first one because only categories has more than one selectable index
+    Set<int> selectedIndexes = _getSelectedFilterIndexes(
+        selectedFilterList, ExploreFilterType.event_time);
+    int index = (selectedIndexes != null && selectedIndexes.isNotEmpty)
+        ? selectedIndexes.first
+        : -1; //Get first one because only categories has more than one selectable index
     switch (index) {
-
       case 0: // 'Upcoming':
         break;
-      
+
       case 1: // 'Today':
         {
           endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
         }
         break;
-      
+
       case 2: // 'Next 7 days':
         {
           endDate = now.add(Duration(days: 6));
         }
         break;
-      
+
       case 3: // 'This Weekend':
         {
           int currentWeekDay = now.weekday;
-          DateTime weekendStartDateTime = DateTime(
-              now.year, now.month, now.day, 0, 0, 0)
-              .add(Duration(days: (6 - currentWeekDay)));
+          DateTime weekendStartDateTime =
+              DateTime(now.year, now.month, now.day, 0, 0, 0)
+                  .add(Duration(days: (6 - currentWeekDay)));
           startDate =
-          now.isBefore(weekendStartDateTime) ? weekendStartDateTime : now;
+              now.isBefore(weekendStartDateTime) ? weekendStartDateTime : now;
           endDate = DateTime(now.year, now.month, now.day, 23, 59, 59)
               .add(Duration(days: (7 - currentWeekDay)));
         }
         break;
-      
+
       case 4: //'Next 30 days':
         {
           DateTime next = startDate.add(Duration(days: 30));
@@ -658,13 +732,10 @@ class ExplorePanelState extends State<ExplorePanel>
     DateTime nowUni = AppDateTime().getUniLocalTimeFromUtcTime(now.toUtc());
     int hoursDiffToUni = now.hour - nowUni.hour;
     DateTime startDateUni = startDate.add(Duration(hours: hoursDiffToUni));
-    DateTime endDateUni = (endDate != null) ? endDate.add(
-        Duration(hours: hoursDiffToUni)) : null;
+    DateTime endDateUni =
+        (endDate != null) ? endDate.add(Duration(hours: hoursDiffToUni)) : null;
 
-    return {
-      'start_date' : startDateUni,
-      'end_date' : endDateUni
-    };
+    return {'start_date': startDateUni, 'end_date': endDateUni};
   }
 
   List<String> _getSelectedEventTags(List<ExploreFilter> selectedFilterList) {
@@ -676,7 +747,8 @@ class ExplorePanelState extends State<ExplorePanel>
         int index = selectedFilter.firstSelectedIndex;
         if (index == 0) {
           return null; //All Tags
-        } else { //My tags
+        } else {
+          //My tags
           return User().getTags();
         }
       }
@@ -737,11 +809,14 @@ class ExplorePanelState extends State<ExplorePanel>
   String _getFilterHintByType(ExploreFilterType filterType) {
     switch (filterType) {
       case ExploreFilterType.categories:
-        return Localization().getStringEx('panel.explore.filter.categories.hint', '');
+        return Localization()
+            .getStringEx('panel.explore.filter.categories.hint', '');
       case ExploreFilterType.work_time:
-        return Localization().getStringEx('panel.explore.filter.worktimes.hint', '');
+        return Localization()
+            .getStringEx('panel.explore.filter.worktimes.hint', '');
       case ExploreFilterType.payment_type:
-        return Localization().getStringEx('panel.explore.filter.payment_types.hint', '');
+        return Localization()
+            .getStringEx('panel.explore.filter.payment_types.hint', '');
       case ExploreFilterType.event_time:
         return Localization().getStringEx('panel.explore.filter.time.hint', '');
       case ExploreFilterType.event_tags:
@@ -757,23 +832,21 @@ class ExplorePanelState extends State<ExplorePanel>
     if (_loadingTask != null) {
       return _buildLoading();
     }
-    
+
     Widget exploresContent;
 
     if (Connectivity().isOffline) {
       exploresContent = _buildOffline();
-    }
-    else if (_exploresCount > 0) {
+    } else if (_exploresCount > 0) {
       exploresContent = ListView.separated(
         separatorBuilder: (context, index) => Divider(
-              color: Colors.transparent,
-            ),
+          color: Colors.transparent,
+        ),
         itemCount: _exploresCount,
         itemBuilder: _buildExploreEntry,
         controller: _scrollController,
       );
-    }
-    else {
+    } else {
       exploresContent = _buildEmpty();
     }
 
@@ -783,18 +856,21 @@ class ExplorePanelState extends State<ExplorePanel>
             color: Styles().colors.background, child: exploresContent));
   }
 
-  Widget _buildExploreEntry(BuildContext context, int index){
-    if(_hasDiningSpecials) {
+  Widget _buildExploreEntry(BuildContext context, int index) {
+    if (_hasDiningSpecials) {
       if (index == 0) {
-        return HorizontalDiningSpecials(specials: _diningSpecials,);
+        return HorizontalDiningSpecials(
+          specials: _diningSpecials,
+        );
       }
     }
 
-    int realIndex = _hasDiningSpecials ? index -1 : index;
+    int realIndex = _hasDiningSpecials ? index - 1 : index;
     Explore explore = _displayExplores[realIndex];
 
-    List<ExploreFilter> selectedFilterList = (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
-    List<String> tags  = _getSelectedEventTags(selectedFilterList);
+    List<ExploreFilter> selectedFilterList =
+        (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
+    List<String> tags = _getSelectedEventTags(selectedFilterList);
 
     ExploreCard exploreView = ExploreCard(
         explore: explore,
@@ -803,9 +879,7 @@ class ExplorePanelState extends State<ExplorePanel>
         hideInterests: tags == null,
         showTopBorder: true,
         source: _selectedTab?.toString());
-    return Padding(
-        padding: EdgeInsets.only(top: 16),
-        child: exploreView);
+    return Padding(padding: EdgeInsets.only(top: 16), child: exploreView);
   }
 
   Widget _buildMapView(BuildContext context) {
@@ -815,11 +889,15 @@ class ExplorePanelState extends State<ExplorePanel>
       title = _selectedMapExplore?.exploreTitle;
       description = _selectedMapExplore.exploreLocation?.description;
       exploreColor = _selectedMapExplore.uiColor;
-    }
-    else if  (_selectedMapExplore is List<Explore>) {
-      String exploreName = ExploreHelper.getExploresListDisplayTitle(_selectedMapExplore);
-      title = sprintf(Localization().getStringEx('panel.explore.map.popup.title.format', '%d %s'), [_selectedMapExplore?.length, exploreName]);
-      Explore explore = _selectedMapExplore.isNotEmpty ? _selectedMapExplore.first : null;
+    } else if (_selectedMapExplore is List<Explore>) {
+      String exploreName =
+          ExploreHelper.getExploresListDisplayTitle(_selectedMapExplore);
+      title = sprintf(
+          Localization()
+              .getStringEx('panel.explore.map.popup.title.format', '%d %s'),
+          [_selectedMapExplore?.length, exploreName]);
+      Explore explore =
+          _selectedMapExplore.isNotEmpty ? _selectedMapExplore.first : null;
       description = explore?.exploreLocation?.description ?? "";
       exploreColor = explore?.uiColor ?? Styles().colors.fillColorSecondary;
     }
@@ -828,7 +906,7 @@ class ExplorePanelState extends State<ExplorePanel>
     return Stack(overflow: Overflow.clip, children: <Widget>[
       MapWidget(
         onMapCreated: _onNativeMapCreated,
-        creationParams: { "myLocationEnabled" : _userLocationEnabled()},
+        creationParams: {"myLocationEnabled": _userLocationEnabled()},
       ),
       Positioned(
           bottom: _mapExploreBarAnimationController.value,
@@ -838,8 +916,13 @@ class ExplorePanelState extends State<ExplorePanel>
             height: MapBarHeight,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(top: BorderSide(color: exploreColor, width: 2, style: BorderStyle.solid),
-                  bottom: BorderSide(color: Styles().colors.surfaceAccent, width: 1, style: BorderStyle.solid)),
+              border: Border(
+                  top: BorderSide(
+                      color: exploreColor, width: 2, style: BorderStyle.solid),
+                  bottom: BorderSide(
+                      color: Styles().colors.surfaceAccent,
+                      width: 1,
+                      style: BorderStyle.solid)),
             ),
             child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -863,42 +946,57 @@ class ExplorePanelState extends State<ExplorePanel>
                       ),
                       Row(
                         children: <Widget>[
-                          _userLocationEnabled() ?
-                          Row(
-                              children: <Widget>[
-                                SizedBox(width: buttonWidth, child: RoundedButton(
-                                    label: Localization().getStringEx('panel.explore.button.directions.title', 'Directions'),
-                                    hint: Localization().getStringEx('panel.explore.button.directions.hint', ''),
-                                    backgroundColor: Colors.white,
-                                    height: 32,
-                                    fontSize: 16.0,
-                                    textColor: Styles().colors.fillColorPrimary,
-                                    borderColor: Styles().colors.fillColorSecondary,
-                                    padding: EdgeInsets.symmetric(horizontal: 24),
-                                    onTap: () {
-                                      Analytics.instance.logSelect(target: 'Directions');
-                                      _presentMapExploreDirections(context);
-                                    }),),
-                                Container(
-                                  width: 12,
-                                ),
-                              ]) :
-                          Container(),
-                          SizedBox(width: buttonWidth, child: RoundedButton(
-                              label: Localization().getStringEx('panel.explore.button.details.title', 'Details'),
-                              hint: Localization().getStringEx('panel.explore.button.details.hint', ''),
-                              backgroundColor: Colors.white,
-                              height: 32,
-                              fontSize: 16.0,
-                              textColor: Styles().colors.fillColorPrimary,
-                              borderColor: Styles().colors.fillColorSecondary,
-                              padding: EdgeInsets.symmetric(horizontal: 24),
-                              onTap: () {
-                                Analytics.instance.logSelect(target: 'Details');
-                                _presentMapExploreDetail(context);
-                              }),),
-
-
+                          _userLocationEnabled()
+                              ? Row(children: <Widget>[
+                                  SizedBox(
+                                    width: buttonWidth,
+                                    child: RoundedButton(
+                                        label: Localization().getStringEx(
+                                            'panel.explore.button.directions.title',
+                                            'Directions'),
+                                        hint: Localization().getStringEx(
+                                            'panel.explore.button.directions.hint',
+                                            ''),
+                                        backgroundColor: Colors.white,
+                                        height: 32,
+                                        fontSize: 16.0,
+                                        textColor:
+                                            Styles().colors.fillColorPrimary,
+                                        borderColor:
+                                            Styles().colors.fillColorSecondary,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24),
+                                        onTap: () {
+                                          Analytics.instance
+                                              .logSelect(target: 'Directions');
+                                          _presentMapExploreDirections(context);
+                                        }),
+                                  ),
+                                  Container(
+                                    width: 12,
+                                  ),
+                                ])
+                              : Container(),
+                          SizedBox(
+                            width: buttonWidth,
+                            child: RoundedButton(
+                                label: Localization().getStringEx(
+                                    'panel.explore.button.details.title',
+                                    'Details'),
+                                hint: Localization().getStringEx(
+                                    'panel.explore.button.details.hint', ''),
+                                backgroundColor: Colors.white,
+                                height: 32,
+                                fontSize: 16.0,
+                                textColor: Styles().colors.fillColorPrimary,
+                                borderColor: Styles().colors.fillColorSecondary,
+                                padding: EdgeInsets.symmetric(horizontal: 24),
+                                onTap: () {
+                                  Analytics.instance
+                                      .logSelect(target: 'Details');
+                                  _presentMapExploreDetail(context);
+                                }),
+                          ),
                         ],
                       )
                     ])),
@@ -908,104 +1006,168 @@ class ExplorePanelState extends State<ExplorePanel>
 
   void _selectMapExplore(dynamic explore) {
     if (explore != null) {
-      _refresh(() { _selectedMapExplore = explore;});
+      _refresh(() {
+        _selectedMapExplore = explore;
+      });
       _mapExploreBarAnimationController.forward();
-    }
-    else if (_selectedMapExplore != null) {
-      _mapExploreBarAnimationController.reverse().then((_){
-        _refresh(() { _selectedMapExplore = null;});
+    } else if (_selectedMapExplore != null) {
+      _mapExploreBarAnimationController.reverse().then((_) {
+        _refresh(() {
+          _selectedMapExplore = null;
+        });
       });
     }
   }
 
   void _presentMapExploreDirections(BuildContext context) async {
-      dynamic explore = _selectedMapExplore;
-      _mapExploreBarAnimationController.reverse().then((_){
-        _refresh(() { _selectedMapExplore = null;});
+    dynamic explore = _selectedMapExplore;
+    _mapExploreBarAnimationController.reverse().then((_) {
+      _refresh(() {
+        _selectedMapExplore = null;
       });
-      if (explore != null) {
-        NativeCommunicator().launchExploreMapDirections(target: explore);
-      }
+    });
+    if (explore != null) {
+      NativeCommunicator().launchExploreMapDirections(target: explore);
+    }
   }
-  
-  void _presentMapExploreDetail(BuildContext context) {
-      dynamic explore = _selectedMapExplore;
-      _mapExploreBarAnimationController.reverse().then((_){
-        _refresh(() { _selectedMapExplore = null;});
-      });
 
-      if (explore is Explore) {
-        Event event = (explore is Event) ? explore : null;
-        if (event?.isGameEvent ?? false) {
-          Navigator.push(context, CupertinoPageRoute(builder: (context) =>
-              AthleticsGameDetailPanel(gameId: event.speaker, sportName: event.registrationLabel,)));
-        }
-        else {
-          Navigator.push(context, CupertinoPageRoute(builder: (context) =>
-            ExploreDetailPanel(explore: explore,initialLocationData: _locationData,)));
-        }
+  void _presentMapExploreDetail(BuildContext context) {
+    dynamic explore = _selectedMapExplore;
+    _mapExploreBarAnimationController.reverse().then((_) {
+      _refresh(() {
+        _selectedMapExplore = null;
+      });
+    });
+
+    if (explore is Explore) {
+      Event event = (explore is Event) ? explore : null;
+      if (event?.isGameEvent ?? false) {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => AthleticsGameDetailPanel(
+                      gameId: event.speaker,
+                      sportName: event.registrationLabel,
+                    )));
+      } else {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => ExploreDetailPanel(
+                      explore: explore,
+                      initialLocationData: _locationData,
+                    )));
       }
-      else if (explore is List<Explore>) {
-        Navigator.push(context, CupertinoPageRoute(builder: (context) => ExploreListPanel(explores: explore)));
-      }
+    } else if (explore is List<Explore>) {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => ExploreListPanel(explores: explore)));
+    }
   }
 
   Widget _buildLoading() {
     return Semantics(
-      label: Localization().getStringEx('panel.explore.state.loading.title', 'Loading'),
-      hint: Localization().getStringEx('panel.explore.state.loading.hint', 'Please wait'),
-      excludeSemantics: true,
-      child:Container(
-      color: Styles().colors.background,
-      child: Align(
-        alignment: Alignment.center,
-        child: CircularProgressIndicator(),
-      ),
-    ));
+        label: Localization()
+            .getStringEx('panel.explore.state.loading.title', 'Loading'),
+        hint: Localization()
+            .getStringEx('panel.explore.state.loading.hint', 'Please wait'),
+        excludeSemantics: true,
+        child: Container(
+          color: Styles().colors.background,
+          child: Align(
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(),
+          ),
+        ));
   }
 
   Widget _buildEmpty() {
     String message;
     switch (_selectedTab) {
-      case ExploreTab.All:    message = Localization().getStringEx('panel.explore.state.online.empty.all', 'No events.'); break;
-      case ExploreTab.NearMe: message = Localization().getStringEx('panel.explore.state.online.empty.near_me', 'No events near me.'); break;
-      case ExploreTab.Events: message = Localization().getStringEx('panel.explore.state.online.empty.events', 'No upcoming events.'); break;
-      case ExploreTab.Dining: message = Localization().getStringEx('panel.explore.state.online.empty.dining', 'No dining locations are currently open.'); break;
-      default:                message =  ''; break;
+      case ExploreTab.All:
+        message = Localization()
+            .getStringEx('panel.explore.state.online.empty.all', 'No events.');
+        break;
+      case ExploreTab.NearMe:
+        message = Localization().getStringEx(
+            'panel.explore.state.online.empty.near_me', 'No events near me.');
+        break;
+      case ExploreTab.Events:
+        message = Localization().getStringEx(
+            'panel.explore.state.online.empty.events', 'No upcoming events.');
+        break;
+      case ExploreTab.Dining:
+        message = Localization().getStringEx(
+            'panel.explore.state.online.empty.dining',
+            'No dining locations are currently open.');
+        break;
+      default:
+        message = '';
+        break;
     }
-    return Container(child: Align(alignment: Alignment.center,
-      child: Text(message, textAlign: TextAlign.center,),
+    return Container(
+        child: Align(
+      alignment: Alignment.center,
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+      ),
     ));
   }
 
   Widget _buildOffline() {
     String message;
     switch (_selectedTab) {
-      case ExploreTab.All:    message = Localization().getStringEx('panel.explore.state.offline.empty.all', 'No events available while offline.'); break;
-      case ExploreTab.NearMe: message = Localization().getStringEx('panel.explore.state.offline.empty.near_me', 'No events near me available while offline.'); break;
-      case ExploreTab.Events: message = Localization().getStringEx('panel.explore.state.offline.empty.events', 'No upcoming events available while offline..'); break;
-      case ExploreTab.Dining: message = Localization().getStringEx('panel.explore.state.offline.empty.dining', 'No dining locations available while offline.'); break;
-      default:                message =  ''; break;
+      case ExploreTab.All:
+        message = Localization().getStringEx(
+            'panel.explore.state.offline.empty.all',
+            'No events available while offline.');
+        break;
+      case ExploreTab.NearMe:
+        message = Localization().getStringEx(
+            'panel.explore.state.offline.empty.near_me',
+            'No events near me available while offline.');
+        break;
+      case ExploreTab.Events:
+        message = Localization().getStringEx(
+            'panel.explore.state.offline.empty.events',
+            'No upcoming events available while offline..');
+        break;
+      case ExploreTab.Dining:
+        message = Localization().getStringEx(
+            'panel.explore.state.offline.empty.dining',
+            'No dining locations available while offline.');
+        break;
+      default:
+        message = '';
+        break;
     }
-    return Column(children: <Widget>[
-      Expanded(child: Container(), flex: 1),
-      Text(Localization().getStringEx("app.offline.message.title", "You appear to be offline"), style: TextStyle(fontSize: 16),),
-      Container(height:8),
-      Text(message),
-      Expanded(child: Container(), flex: 3),
-    ],);
+    return Column(
+      children: <Widget>[
+        Expanded(child: Container(), flex: 1),
+        Text(
+          Localization().getStringEx(
+              "app.offline.message.title", "You appear to be offline"),
+          style: TextStyle(fontSize: 16),
+        ),
+        Container(height: 8),
+        Text(message),
+        Expanded(child: Container(), flex: 3),
+      ],
+    );
   }
 
   Widget _buildDimmedContainer() {
     return Visibility(
         visible: _filterOptionsVisible,
-        child: BlockSemantics(child:Container(color: Color(0x99000000))));
+        child: BlockSemantics(child: Container(color: Color(0x99000000))));
   }
 
-  void _selectDisplayType (ListMapDisplayType displayType) {
+  void _selectDisplayType(ListMapDisplayType displayType) {
     Analytics.instance.logSelect(target: displayType.toString());
     if (_displayType != displayType) {
-      _refresh((){
+      _refresh(() {
         _displayType = displayType;
         _enableMap(_displayType == ListMapDisplayType.Map);
       });
@@ -1013,9 +1175,8 @@ class ExplorePanelState extends State<ExplorePanel>
   }
 
   Widget _buildFilterValuesContainer() {
-
-
-    List<ExploreFilter> tabFilters = (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
+    List<ExploreFilter> tabFilters =
+        (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
     ExploreFilter selectedFilter;
     if (tabFilters != null && tabFilters.isNotEmpty) {
       for (ExploreFilter filter in tabFilters) {
@@ -1029,51 +1190,61 @@ class ExplorePanelState extends State<ExplorePanel>
       return Container();
     }
     List<String> filterValues = _getFilterValuesByType(selectedFilter.type);
-    List<String> filterSubLabels = (selectedFilter.type ==
-        ExploreFilterType.event_time) ? _buildFilterEventDateSubLabels() : null;
+    List<String> filterSubLabels =
+        (selectedFilter.type == ExploreFilterType.event_time)
+            ? _buildFilterEventDateSubLabels()
+            : null;
     bool hasSubLabels = AppCollection.isCollectionNotEmpty(filterSubLabels);
-    return Semantics(sortKey: _ExploreSortKey.filterLayout, child:Visibility(
-      visible: _filterOptionsVisible,
-      child: Padding(
-          padding: EdgeInsets.only(left: 16, right: 16, top: 36, bottom: 40),
-          child: Semantics(child:Container(
-            decoration: BoxDecoration(
-              color: Styles().colors.fillColorSecondary,
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(top: 2),
-              child: Container(
-                color: Colors.white,
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  separatorBuilder: (context, index) => Divider(
+    return Semantics(
+        sortKey: _ExploreSortKey.filterLayout,
+        child: Visibility(
+          visible: _filterOptionsVisible,
+          child: Padding(
+              padding:
+                  EdgeInsets.only(left: 16, right: 16, top: 36, bottom: 40),
+              child: Semantics(
+                  child: Container(
+                decoration: BoxDecoration(
+                  color: Styles().colors.fillColorSecondary,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: Container(
+                    color: Colors.white,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      separatorBuilder: (context, index) => Divider(
                         height: 1,
                         color: Styles().colors.fillColorPrimaryTransparent03,
                       ),
-                  itemCount: filterValues.length,
-                  itemBuilder: (context, index) {
-                    return FilterListItemWidget(
-                      label: filterValues[index],
-                      subLabel: hasSubLabels ? filterSubLabels[index] : null,
-                      selected: (selectedFilter.selectedIndexes != null && selectedFilter.selectedIndexes.contains(index)),
-                      onTap: () {
-                        Analytics.instance.logSelect(target: "FilterItem: "+filterValues[index]);
-                        _onFilterValueClick(selectedFilter, index);
+                      itemCount: filterValues.length,
+                      itemBuilder: (context, index) {
+                        return FilterListItemWidget(
+                          label: filterValues[index],
+                          subLabel:
+                              hasSubLabels ? filterSubLabels[index] : null,
+                          selected: (selectedFilter.selectedIndexes != null &&
+                              selectedFilter.selectedIndexes.contains(index)),
+                          onTap: () {
+                            Analytics.instance.logSelect(
+                                target: "FilterItem: " + filterValues[index]);
+                            _onFilterValueClick(selectedFilter, index);
+                          },
+                        );
                       },
-                    );
-                  },
-                  controller: _scrollController,
+                      controller: _scrollController,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ))),
-    ));
+              ))),
+        ));
   }
 
   List<Widget> _buildFilterWidgets() {
     List<Widget> filterTypeWidgets = List<Widget>();
-    List<ExploreFilter> visibleFilters = (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
+    List<ExploreFilter> visibleFilters =
+        (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
     if (visibleFilters == null ||
         visibleFilters.isEmpty ||
         _eventCategories == null) {
@@ -1099,19 +1270,24 @@ class ExplorePanelState extends State<ExplorePanel>
         hint: _getFilterHintByType(selectedFilter.type),
         active: selectedFilter.active,
         visible: true,
-        onTap: (){
+        onTap: () {
           Analytics.instance.logSelect(target: "Filter: $filterHeaderLabel");
-          return _onFilterTypeClicked(selectedFilter);},
+          return _onFilterTypeClicked(selectedFilter);
+        },
       ));
     }
     return filterTypeWidgets;
   }
 
   List<RoundedTab> _buildTabWidgets() {
-
     List<RoundedTab> tabs = new List<RoundedTab>();
     for (ExploreTab exploreTab in _exploreTabs) {
-      tabs.add(RoundedTab(title: exploreTabName(exploreTab), hint: exploreTabHint(exploreTab), tabIndex: ExploreTab.values.indexOf(exploreTab), listener: this, selected: (_selectedTab == exploreTab)));
+      tabs.add(RoundedTab(
+          title: exploreTabName(exploreTab),
+          hint: exploreTabHint(exploreTab),
+          tabIndex: ExploreTab.values.indexOf(exploreTab),
+          listener: this,
+          selected: (_selectedTab == exploreTab)));
     }
     return tabs;
   }
@@ -1125,21 +1301,35 @@ class ExplorePanelState extends State<ExplorePanel>
 
     if (event?.isComposite ?? false) {
       Navigator.push(
-          context, CupertinoPageRoute(builder: (context) => CompositeEventsDetailPanel(parentEvent: event, initialLocationData: _locationData,)));
-    }
-    else if (event?.isGameEvent ?? false) {
-      Navigator.push(context, CupertinoPageRoute(builder: (context) =>
-          AthleticsGameDetailPanel(gameId: event.speaker, sportName: event.registrationLabel,)));
-    }
-    else {
-      Navigator.push(context, CupertinoPageRoute(builder: (context) =>
-          ExploreDetailPanel(explore: explore,initialLocationData: _locationData,)));
+          context,
+          CupertinoPageRoute(
+              builder: (context) => CompositeEventsDetailPanel(
+                    parentEvent: event,
+                    initialLocationData: _locationData,
+                  )));
+    } else if (event?.isGameEvent ?? false) {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => AthleticsGameDetailPanel(
+                    gameId: event.speaker,
+                    sportName: event.registrationLabel,
+                  )));
+    } else {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => ExploreDetailPanel(
+                    explore: explore,
+                    initialLocationData: _locationData,
+                  )));
     }
   }
 
   void _onFilterTypeClicked(ExploreFilter selectedFilter) {
     // Analytics.instance.logSelect(target:...);
-    List<ExploreFilter> tabFilters = (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
+    List<ExploreFilter> tabFilters =
+        (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
     _refresh(() {
       if (tabFilters != null) {
         for (ExploreFilter filter in tabFilters) {
@@ -1155,7 +1345,7 @@ class ExplorePanelState extends State<ExplorePanel>
   void _onFilterValueClick(ExploreFilter selectedFilter, int newValueIndex) {
     //Apply custom logic for selecting event categories.
     Set<int> selectedIndexes = Set.of(selectedFilter.selectedIndexes); //Copy
-    
+
     // JP: Change category selection back to radio button only. Only one of the possibilities should be picked at a time. Sorry I asked for the change.
     selectedIndexes = {newValueIndex};
     /*if (selectedFilter.type == ExploreFilterType.categories) {
@@ -1175,7 +1365,7 @@ class ExplorePanelState extends State<ExplorePanel>
     } else {
       selectedIndexes = {newValueIndex};
     }*/
-    
+
     selectedFilter.selectedIndexes = selectedIndexes;
     selectedFilter.active = _filterOptionsVisible = false;
     _loadExplores();
@@ -1188,7 +1378,7 @@ class ExplorePanelState extends State<ExplorePanel>
   @override
   void onTabClicked(int tabIndex, RoundedTab tab) {
     if ((0 <= tabIndex) && (tabIndex < ExploreTab.values.length)) {
-      Analytics.instance.logSelect(target: tab.title) ;
+      Analytics.instance.logSelect(target: tab.title);
       selectTab(ExploreTab.values[tabIndex]);
     }
   }
@@ -1215,27 +1405,44 @@ class ExplorePanelState extends State<ExplorePanel>
 
   static String exploreTabName(ExploreTab exploreTab) {
     switch (exploreTab) {
-      case ExploreTab.All:    return Localization().getStringEx('panel.explore.button.all.title', 'All');
-      case ExploreTab.NearMe: return Localization().getStringEx('panel.explore.button.near_me.title', 'Events Near Me');
-      case ExploreTab.Events: return Localization().getStringEx('panel.explore.button.events.title', 'Events');
-      case ExploreTab.Dining: return Localization().getStringEx('panel.explore.button.dining.title', 'Dining');
-      default:                return null;
+      case ExploreTab.All:
+        return Localization()
+            .getStringEx('panel.explore.button.all.title', 'All');
+      case ExploreTab.NearMe:
+        return Localization().getStringEx(
+            'panel.explore.button.near_me.title', 'Events Near Me');
+      case ExploreTab.Events:
+        return Localization()
+            .getStringEx('panel.explore.button.events.title', 'Events');
+      case ExploreTab.Dining:
+        return Localization()
+            .getStringEx('panel.explore.button.dining.title', 'Dining');
+      default:
+        return null;
     }
   }
 
   static String exploreTabHint(ExploreTab exploreTab) {
     switch (exploreTab) {
-      case ExploreTab.All:    return Localization().getStringEx('panel.explore.button.all.hint', '');
-      case ExploreTab.NearMe: return Localization().getStringEx('panel.explore.button.near_me.hint', '');
-      case ExploreTab.Events: return Localization().getStringEx('panel.explore.button.events.hint', '');
-      case ExploreTab.Dining: return Localization().getStringEx('panel.explore.button.dining.hint', '');
-      default:                return null;
+      case ExploreTab.All:
+        return Localization().getStringEx('panel.explore.button.all.hint', '');
+      case ExploreTab.NearMe:
+        return Localization()
+            .getStringEx('panel.explore.button.near_me.hint', '');
+      case ExploreTab.Events:
+        return Localization()
+            .getStringEx('panel.explore.button.events.hint', '');
+      case ExploreTab.Dining:
+        return Localization()
+            .getStringEx('panel.explore.button.dining.hint', '');
+      default:
+        return null;
     }
   }
 
   void _deactivateSelectedFilters() {
-    List<ExploreFilter> tabFilters = (_tabToFilterMap != null)
-        ? _tabToFilterMap[_selectedTab] : null;
+    List<ExploreFilter> tabFilters =
+        (_tabToFilterMap != null) ? _tabToFilterMap[_selectedTab] : null;
     if (tabFilters != null && tabFilters.isNotEmpty) {
       for (ExploreFilter filter in tabFilters) {
         filter.active = false;
@@ -1244,8 +1451,8 @@ class ExplorePanelState extends State<ExplorePanel>
     _filterOptionsVisible = false;
   }
 
-  void _refresh(Function fn){
-    if(!disposed && mounted) {
+  void _refresh(Function fn) {
+    if (!disposed && mounted) {
       this.setState(fn);
     }
   }
@@ -1268,7 +1475,10 @@ class ExplorePanelState extends State<ExplorePanel>
   void _enableMap(bool enable) {
     if (_nativeMapController != null) {
       _nativeMapController.enable(enable);
-      Analytics().logMapDisplay(action: enable ? Analytics.LogMapDisplayShowActionName : Analytics.LogMapDisplayHideActionName);
+      Analytics().logMapDisplay(
+          action: enable
+              ? Analytics.LogMapDisplayShowActionName
+              : Analytics.LogMapDisplayHideActionName);
     }
   }
 
@@ -1282,7 +1492,10 @@ class ExplorePanelState extends State<ExplorePanel>
     String mapExploreId = mapExplore?.exploreId;
     if ((_displayExplores != null) && (mapExploreId != null)) {
       for (Explore displayExplore in _displayExplores) {
-        if ((displayExplore.runtimeType.toString() == mapExplore.runtimeType.toString()) && (displayExplore.exploreId != null) && (displayExplore.exploreId == mapExploreId)) {
+        if ((displayExplore.runtimeType.toString() ==
+                mapExplore.runtimeType.toString()) &&
+            (displayExplore.exploreId != null) &&
+            (displayExplore.exploreId == mapExploreId)) {
           return displayExplore;
         }
       }
@@ -1301,49 +1514,41 @@ class ExplorePanelState extends State<ExplorePanel>
   }
 
   // NotificationsListener
-  
+
   @override
   void onNotification(String name, dynamic param) {
     if (name == LocationServices.notifyStatusChanged) {
       _onLocationServicesStatusChanged(param);
-    }
-    else if (name == Connectivity.notifyStatusChanged) {
+    } else if (name == Connectivity.notifyStatusChanged) {
       if (Connectivity().isNotOffline) {
         _loadEventCategories();
       }
-    }
-    else if (name == Localization.notifyStringsUpdated) {
-      setState(() { });
-    }
-    else if (name == NativeCommunicator.notifyMapSelectExplore) {
+    } else if (name == Localization.notifyStringsUpdated) {
+      setState(() {});
+    } else if (name == NativeCommunicator.notifyMapSelectExplore) {
       _onNativeMapSelectExplore(param['mapId'], param['exploreJson']);
-    }
-    else if (name == NativeCommunicator.notifyMapClearExplore) {
+    } else if (name == NativeCommunicator.notifyMapClearExplore) {
       _onNativeMapClearExplore(param['mapId']);
-    }
-    else if(name == Storage.offsetDateKey){
+    } else if (name == Storage.offsetDateKey) {
       _loadExplores();
-    }
-    else if(name == Storage.useDeviceLocalTimeZoneKey){
+    } else if (name == Storage.useDeviceLocalTimeZoneKey) {
       _loadExplores();
-    }
-    else if (name == User.notifyPrivacyLevelChanged) {
+    } else if (name == User.notifyPrivacyLevelChanged) {
       _onPrivacyLevelChanged();
-    }
-    else if(name == Styles.notifyChanged){
-      setState(() { });
+    } else if (name == Styles.notifyChanged) {
+      setState(() {});
     }
   }
 
   void _onPrivacyLevelChanged() {
     if (User().privacyMatch(2)) {
-      LocationServices.instance.status.then((LocationServicesStatus locationServicesStatus) {
+      LocationServices.instance.status
+          .then((LocationServicesStatus locationServicesStatus) {
         _locationServicesStatus = locationServicesStatus;
         _updateTabs();
       });
-    }
-    else {
-        _updateTabs();
+    } else {
+      _updateTabs();
     }
   }
 
@@ -1359,23 +1564,21 @@ class ExplorePanelState extends State<ExplorePanel>
       dynamic explore;
       if (exploreJson is Map) {
         explore = _exploreFromMapExplore(Explore.fromJson(exploreJson));
-      }
-      else if (exploreJson is List) {
+      } else if (exploreJson is List) {
         explore = _exploresFromMapExplores(Explore.listFromJson(exploreJson));
       }
 
       if (explore != null) {
-          _selectMapExplore(explore);
+        _selectMapExplore(explore);
       }
     }
   }
-  
+
   void _onNativeMapClearExplore(int mapID) {
     if (_nativeMapController.mapId == mapID) {
       _selectMapExplore(null);
     }
   }
-
 }
 
 class ExploreFilter {
@@ -1384,7 +1587,9 @@ class ExploreFilter {
   bool active;
 
   ExploreFilter(
-      {@required this.type, this.selectedIndexes = const {0}, this.active = false});
+      {@required this.type,
+      this.selectedIndexes = const {0},
+      this.active = false});
 
   int get firstSelectedIndex {
     if (selectedIndexes == null || selectedIndexes.isEmpty) {
@@ -1393,4 +1598,3 @@ class ExploreFilter {
     return selectedIndexes.first;
   }
 }
-
