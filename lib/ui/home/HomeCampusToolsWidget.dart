@@ -180,6 +180,7 @@ class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget>
         !DeepCollectionEquality().equals(_contentListCodes, contentListCodes)) {
       setState(() {
         _contentListCodes = contentListCodes;
+        _contentListCodes.add('communities');
       });
     }
   }

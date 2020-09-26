@@ -2,9 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:illinois/service/Styles.dart';
 
+import 'ArtSplashPage.dart';
 import 'MessagePage.dart';
 
 class ChannelPage extends StatelessWidget {
+  final SplashInfo splashInfo;
+
+  const ChannelPage({Key key, this.splashInfo}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,20 +32,34 @@ class ChannelPage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ChannelCard(),
+              ChannelCard(
+                messagePage: MessagePage(
+                  splashInfo: splashInfo,
+                ),
+              ),
               ChannelCard(
                 text: 'Social',
                 description: 'Hop on in and have a chat!',
+                messagePage: MessagePage(
+                  splashInfo: splashInfo,
+                ),
               ),
               ChannelCard(
                 text: 'RSO meetings',
                 description: 'Our weekly RSO meeting',
                 time: '3-4 pm Wednesdays',
+                messagePage: MessagePage(
+                  splashInfo: splashInfo,
+                ),
               ),
               ChannelCard(
-                  text: 'Mentoring',
-                  description: 'Get help from our great mentors!',
-                  time: '5-6 pm Saturdays')
+                text: 'Mentoring',
+                description: 'Get help from our great mentors!',
+                time: '5-6 pm Saturdays',
+                messagePage: MessagePage(
+                  splashInfo: splashInfo,
+                ),
+              )
             ],
           ),
         ),
@@ -54,11 +72,13 @@ class ChannelCard extends StatelessWidget {
   final String text;
   final String description;
   final String time;
+  final MessagePage messagePage;
   const ChannelCard(
       {Key key,
       this.text = 'Front Desk',
       this.description = 'For help or general introductions',
-      this.time = 'All days'})
+      this.time = 'All days',
+      this.messagePage})
       : super(key: key);
 
   @override
@@ -66,7 +86,7 @@ class ChannelCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.push(context, CupertinoPageRoute(builder: (context) {
-          return MessagePage();
+          return messagePage;
         }));
       },
       child: Container(

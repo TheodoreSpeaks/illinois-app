@@ -1,18 +1,32 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:illinois/service/Styles.dart';
+import 'package:illinois/ui/communities/ArtSplashPage.dart';
 
 class MessagePage extends StatefulWidget {
+  final List<Widget> children;
+  final String title;
+  final SplashInfo splashInfo;
+
+  MessagePage({this.children, this.title = 'Messages', this.splashInfo});
   @override
   _MessagePageState createState() => _MessagePageState();
 }
 
 class _MessagePageState extends State<MessagePage> {
   List<Widget> children = [
-    ChatBubble(text: 'Hi guys!', user: 'Angie Smith'),
+    ChatBubble(text: 'Hi guys!', user: 'Angie Shaw'),
     ChatBubble(text: 'Our first meeting will be this Tuesday at 7'),
     ChatBubble(text: 'See you there!'),
     ChatBubbleUser(text: 'Sounds good!')
   ];
+
+  @override
+  void initState() {
+    if (widget.children != null) {
+      this.children = widget.children;
+    }
+  }
 
   var _controller = TextEditingController();
   @override
@@ -23,8 +37,26 @@ class _MessagePageState extends State<MessagePage> {
             icon: Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.pop(context),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.videocam,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                  return ArtSplashPage(
+                    name: widget.title,
+                    splashInfo: widget.splashInfo,
+                  );
+                }));
+
+                // onJoin(context);
+              },
+            )
+          ],
           title: Text(
-            'Messages',
+            widget.title,
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,

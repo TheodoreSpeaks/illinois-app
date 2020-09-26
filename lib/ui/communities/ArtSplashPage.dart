@@ -4,19 +4,20 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'call.dart';
 
-class ArtSplashPage extends StatefulWidget {
-  final String art;
-  final String name;
+class SplashInfo {
   final String title;
   final String artist;
+  final String asset;
+  SplashInfo({this.title, this.artist, this.asset});
+}
+
+class ArtSplashPage extends StatefulWidget {
+  final String name;
+  final SplashInfo splashInfo;
   @override
   _ArtSplashPageState createState() => _ArtSplashPageState();
 
-  ArtSplashPage(
-      {this.art = 'images/la_casa.jpg',
-      this.name = 'La casa',
-      this.title = 'Art',
-      this.artist = 'Artist name'});
+  ArtSplashPage({this.name = 'La casa', this.splashInfo});
 }
 
 class _ArtSplashPageState extends State<ArtSplashPage> {
@@ -31,7 +32,8 @@ class _ArtSplashPageState extends State<ArtSplashPage> {
           height: double.infinity,
           decoration: BoxDecoration(
               image: DecorationImage(
-                  fit: BoxFit.cover, image: AssetImage(widget.art))),
+                  fit: BoxFit.cover,
+                  image: AssetImage(widget.splashInfo.asset))),
           child: Stack(
             children: [
               Positioned(
@@ -48,10 +50,10 @@ class _ArtSplashPageState extends State<ArtSplashPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.title,
+                        Text(widget.splashInfo.title,
                             style:
                                 TextStyle(color: Colors.white, fontSize: 24)),
-                        Text(widget.artist,
+                        Text(widget.splashInfo.artist,
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,

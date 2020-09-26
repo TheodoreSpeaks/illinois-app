@@ -18,9 +18,10 @@ class CommunitiesPage extends StatelessWidget {
         name: 'BNAACC',
         fullName: 'Bruce D. Nesbitt African American Cultural Center',
         asset: 'images/bnaacc.jpg',
-        loadingArtTitle: 'Still We Rise',
-        loadingArtArtist: 'Arvie Smith',
-        loadingArtPath: 'images/stillwerise.jpg',
+        splashInfo: SplashInfo(
+            title: 'Still We Rise',
+            artist: 'Arvie Smith',
+            asset: 'images/stillwerise.jpg'),
         json: [
           {
             'id': '1',
@@ -52,9 +53,10 @@ class CommunitiesPage extends StatelessWidget {
         name: 'La Casa',
         fullName: 'La Casa Cultural Latina',
         asset: 'images/la_casa.jpg',
-        loadingArtTitle: 'Escrito en Piedra',
-        loadingArtArtist: 'Juan Sánchez',
-        loadingArtPath: 'images/escrito.jpg',
+        splashInfo: SplashInfo(
+            artist: 'Juan Sánchez',
+            title: 'Escrito en Piedra',
+            asset: 'images/escrito.jpg'),
         json: [
           {
             'id': '1',
@@ -74,9 +76,10 @@ class CommunitiesPage extends StatelessWidget {
         name: 'AACC',
         fullName: 'Asian American Cultural Center',
         asset: 'images/aacc.jpg',
-        loadingArtTitle: 'Fire',
-        loadingArtArtist: 'Yayoi Kuusama',
-        loadingArtPath: 'images/fire_art.jpg',
+        splashInfo: SplashInfo(
+            artist: 'Yayoi Kuusama',
+            asset: 'images/fire_art.jpg',
+            title: 'Fire'),
         json: [
           {
             'id': '1',
@@ -148,18 +151,10 @@ class CommunityCard extends StatelessWidget {
   final String name;
   final String asset;
   final dynamic json;
-  final String loadingArtArtist;
-  final String loadingArtPath;
-  final String loadingArtTitle;
+  final SplashInfo splashInfo;
 
   CommunityCard(
-      {this.fullName,
-      this.name,
-      this.asset,
-      this.json,
-      this.loadingArtArtist,
-      this.loadingArtPath,
-      this.loadingArtTitle});
+      {this.fullName, this.name, this.asset, this.json, this.splashInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -202,9 +197,7 @@ class CommunityCard extends StatelessWidget {
                                 return CommunityInfoPage(
                                   title: name,
                                   json: json,
-                                  loadingArtTitle: loadingArtTitle,
-                                  loadingArtArtist: loadingArtArtist,
-                                  loadingArtPath: loadingArtPath,
+                                  splashInfo: splashInfo,
                                 );
                               })),
                           child: Text('Visit', style: TextStyle())),

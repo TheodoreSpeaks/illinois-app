@@ -17,16 +17,9 @@ import 'MessagePage.dart';
 class CommunityInfoPage extends StatelessWidget {
   final String title;
   final List<dynamic> json;
-  final String loadingArtPath;
-  final String loadingArtTitle;
-  final String loadingArtArtist;
+  final SplashInfo splashInfo;
 
-  CommunityInfoPage(
-      {this.title,
-      this.json,
-      this.loadingArtPath = 'images/la_casa.jpg',
-      this.loadingArtTitle = 'Art',
-      this.loadingArtArtist = 'Artist'});
+  CommunityInfoPage({this.title, this.json, this.splashInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +42,9 @@ class CommunityInfoPage extends StatelessWidget {
             IconButton(
               onPressed: () {
                 Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                  return ChannelPage();
+                  return ChannelPage(
+                    splashInfo: splashInfo,
+                  );
                 }));
               },
               icon: Icon(Icons.message, color: Colors.white),
@@ -63,9 +58,7 @@ class CommunityInfoPage extends StatelessWidget {
                 Navigator.push(context, CupertinoPageRoute(builder: (context) {
                   return ArtSplashPage(
                     name: title,
-                    art: loadingArtPath,
-                    artist: loadingArtArtist,
-                    title: loadingArtTitle,
+                    splashInfo: splashInfo,
                   );
                 }));
 
