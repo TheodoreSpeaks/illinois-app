@@ -1,7 +1,9 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:illinois/model/Event.dart';
 import 'package:illinois/model/Explore.dart';
+import 'package:illinois/ui/communities/ArtSplashPage.dart';
 import 'package:illinois/ui/communities/call.dart';
 import 'package:illinois/ui/explore/ExploreCard.dart';
 import 'package:illinois/ui/widgets/HeaderBar.dart';
@@ -15,29 +17,6 @@ class CommunityInfoPage extends StatelessWidget {
   final List<dynamic> json;
 
   CommunityInfoPage({this.title, this.json});
-
-  Future<void> _handleCameraAndMic() async {
-    await PermissionHandler().requestPermissions(
-      [PermissionGroup.camera, PermissionGroup.microphone],
-    );
-  }
-
-  Future<void> onJoin(BuildContext context) async {
-    // update input validation
-
-    // await for camera and mic permissions before pushing video page
-    await _handleCameraAndMic();
-    // push video page with given channel name
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CallPage(
-          channelName: title,
-          role: ClientRole.Broadcaster,
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +44,13 @@ class CommunityInfoPage extends StatelessWidget {
                 Icons.videocam,
                 color: Colors.white,
               ),
-              onPressed: () => onJoin(context),
+              onPressed: () {
+                Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                  return ArtSplashPage();
+                }));
+
+                // onJoin(context);
+              },
             )
           ],
         ),
