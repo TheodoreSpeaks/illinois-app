@@ -11,12 +11,21 @@ import 'package:illinois/ui/widgets/TabBarWidget.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'CommunityExploreCard.dart';
+import 'MessagePage.dart';
 
 class CommunityInfoPage extends StatelessWidget {
   final String title;
   final List<dynamic> json;
+  final String loadingArtPath;
+  final String loadingArtTitle;
+  final String loadingArtArtist;
 
-  CommunityInfoPage({this.title, this.json});
+  CommunityInfoPage(
+      {this.title,
+      this.json,
+      this.loadingArtPath = 'images/la_casa.jpg',
+      this.loadingArtTitle = 'Art',
+      this.loadingArtArtist = 'Artist'});
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +46,11 @@ class CommunityInfoPage extends StatelessWidget {
           centerTitle: true,
           actions: [
             IconButton(
+              onPressed: () {
+                Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                  return MessagePage();
+                }));
+              },
               icon: Icon(Icons.message, color: Colors.white),
             ),
             IconButton(
@@ -46,7 +60,12 @@ class CommunityInfoPage extends StatelessWidget {
               ),
               onPressed: () {
                 Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                  return ArtSplashPage();
+                  return ArtSplashPage(
+                    name: title,
+                    art: loadingArtPath,
+                    artist: loadingArtArtist,
+                    title: loadingArtTitle,
+                  );
                 }));
 
                 // onJoin(context);

@@ -111,7 +111,7 @@ class _HomeCampusToolsWidgetState extends State<HomeCampusToolsWidget>
     } else if (code == "communities") {
       label = 'Communities';
       hint = 'communities';
-      iconPath = 'images/icon-campus-tools-athletics.png';
+      iconPath = 'images/icon-campus-communities.jpg';
       onTap = _onTapCommunities;
     } else {
       return null;

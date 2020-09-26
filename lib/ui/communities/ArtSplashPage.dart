@@ -5,10 +5,18 @@ import 'package:permission_handler/permission_handler.dart';
 import 'call.dart';
 
 class ArtSplashPage extends StatefulWidget {
-  final String art = 'images/la_casa.jpg';
-  final String name = 'La casa';
+  final String art;
+  final String name;
+  final String title;
+  final String artist;
   @override
   _ArtSplashPageState createState() => _ArtSplashPageState();
+
+  ArtSplashPage(
+      {this.art = 'images/la_casa.jpg',
+      this.name = 'La casa',
+      this.title = 'Art',
+      this.artist = 'Artist name'});
 }
 
 class _ArtSplashPageState extends State<ArtSplashPage> {
@@ -16,48 +24,45 @@ class _ArtSplashPageState extends State<ArtSplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GestureDetector(
-          onTap: () => onJoin(context),
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.contain, image: AssetImage(widget.art))),
-            child: Stack(
-              children: [
-                Positioned(
-                  bottom: 30,
-                  left: 20,
-                  child: Row(
-                    children: [
-                      CircularProgressIndicator(
-                        backgroundColor: Colors.white,
-                      ),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Interior of La Casa',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 24)),
-                          Text('by Theodore Li',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w200,
-                                  fontStyle: FontStyle.italic))
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+      body: GestureDetector(
+        onTap: () => onJoin(context),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  fit: BoxFit.cover, image: AssetImage(widget.art))),
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 30,
+                left: 20,
+                child: Row(
+                  children: [
+                    CircularProgressIndicator(
+                      backgroundColor: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 30,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.title,
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 24)),
+                        Text(widget.artist,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w200,
+                                fontStyle: FontStyle.italic))
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
         ),
       ),
