@@ -11,33 +11,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'CommunityExploreCard.dart';
 
 class CommunityInfoPage extends StatelessWidget {
-  final String title = 'BNAACC';
-  final json = [
-    {
-      'id': '1',
-      'title': 'MLK Day of Service',
-      'timeString': 'January 18, 2021, 1-4 PM',
-      'imageURL': 'images/mlk.jpg'
-    },
-    {
-      'id': '1',
-      'title': 'Black History Month',
-      'timeString': 'February 2021',
-      'imageURL': 'images/black_history_month.png'
-    },
-    {
-      'id': '1',
-      'title': 'Ebony Excellence Awards',
-      'timeString': 'April 13, 2021 1-2 PM',
-      'imageURL': 'images/excellence_awards.png'
-    },
-    {
-      'id': '1',
-      'title': '50th Anniversary Celebration',
-      'timeString': 'April 13, 2021 1-2 PM',
-      'imageURL': 'images/bnaacc.jpg'
-    },
-  ];
+  final String title;
+  final List<dynamic> json;
+
+  CommunityInfoPage({this.title, this.json});
 
   Future<void> _handleCameraAndMic() async {
     await PermissionHandler().requestPermissions(
@@ -104,22 +81,6 @@ class CommunityInfoPage extends StatelessWidget {
               ),
             );
           },
-        )
-        // body: Column(
-        //   children: [
-        //     CommunityExploreCard(
-        //         showTopBorder: true,
-        //         explore: Event(
-        //           json: {
-        //             'id': '1',
-        //             'title': 'Fun Run',
-        //             'placeID': 'Zoom',
-        //             'timeString': 'Sunday, September 27 @ 2:00 PM',
-        //             'imageURL': 'images/bnaacc.jpg'
-        //           },
-        //         ))
-        //   ],
-        // ),
-        );
+        ));
   }
 }

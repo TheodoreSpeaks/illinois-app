@@ -14,10 +14,103 @@ class CommunitiesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> pages = [
       CommunityCard(
-        color: Colors.red,
+        name: 'BNAACC',
+        fullName: 'Bruce D. Nesbitt African American Cultural Center',
+        asset: 'images/bnaacc.jpg',
+        json: [
+          {
+            'id': '1',
+            'title': 'MLK Day of Service',
+            'timeString': 'January 18, 2021, 1-4 PM',
+            'imageURL': 'images/mlk.jpg'
+          },
+          {
+            'id': '1',
+            'title': 'Black History Month',
+            'timeString': 'February 2021',
+            'imageURL': 'images/black_history_month.png'
+          },
+          {
+            'id': '1',
+            'title': 'Ebony Excellence Awards',
+            'timeString': 'April 13, 2021 1-2 PM',
+            'imageURL': 'images/excellence_awards.png'
+          },
+          {
+            'id': '1',
+            'title': '50th Anniversary Celebration',
+            'timeString': 'April 13, 2021 1-2 PM',
+            'imageURL': 'images/bnaacc.jpg'
+          },
+        ],
       ),
-      CommunityCard(color: Colors.yellow),
-      CommunityCard(color: Colors.green),
+      CommunityCard(
+        name: 'La Casa',
+        fullName: 'La Casa Cultural Latina',
+        asset: 'images/la_casa.jpg',
+        json: [
+          {
+            'id': '1',
+            'title': 'MLK Day of Service',
+            'timeString': 'January 18, 2021, 1-4 PM',
+            'imageURL': 'images/mlk.jpg'
+          },
+          {
+            'id': '1',
+            'title': 'Black History Month',
+            'timeString': 'February 2021',
+            'imageURL': 'images/black_history_month.png'
+          },
+          {
+            'id': '1',
+            'title': 'Ebony Excellence Awards',
+            'timeString': 'April 13, 2021 1-2 PM',
+            'imageURL': 'images/excellence_awards.png'
+          },
+          {
+            'id': '1',
+            'title': '50th Anniversary Celebration',
+            'timeString': 'April 13, 2021 1-2 PM',
+            'imageURL': 'images/bnaacc.jpg'
+          },
+        ],
+      ),
+      CommunityCard(
+        name: 'AACC',
+        fullName: 'Asian American Cultural Center',
+        asset: 'images/aacc.jpg',
+        json: [
+          {
+            'id': '1',
+            'title': 'Lunar New Year Celebration',
+            'timeString': 'February 12, 2021',
+            'imageURL': 'images/lunar_new_year.jpg'
+          },
+          {
+            'id': '1',
+            'title': 'South Asian American Leadership Conference',
+            'timeString': 'February 22 2021',
+            'imageURL': 'images/aa_leadership.png'
+          },
+          {
+            'title': 'Asia Fest 2021',
+            'timeString': 'April 28, 2021 1-4 pm',
+            'imageURL': 'images/asiafest.jpg'
+          },
+          {
+            'id': '1',
+            'title': 'Asiantation',
+            'timeString': 'September 8, 2021',
+            'imageURL': 'images/asiantation.jpg'
+          },
+          {
+            'id': '1',
+            'title': 'Diwali Celebration',
+            'timeString': 'November 4, 2021',
+            'imageURL': 'images/diwali.jpg'
+          },
+        ],
+      ),
     ];
     return Scaffold(
       appBar: SimpleHeaderBarWithBack(
@@ -53,9 +146,12 @@ class CommunitiesPage extends StatelessWidget {
 }
 
 class CommunityCard extends StatelessWidget {
-  final Color color;
+  final String fullName;
+  final String name;
+  final String asset;
+  final dynamic json;
 
-  CommunityCard({this.color});
+  CommunityCard({this.fullName, this.name, this.asset, this.json});
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +160,9 @@ class CommunityCard extends StatelessWidget {
         width: 300,
         height: 600,
         decoration: BoxDecoration(
-            color: color,
+            color: Styles().colors.fillColorPrimary,
             image: DecorationImage(
-                image: AssetImage('images/bnaacc.jpg'), fit: BoxFit.fitHeight)),
+                image: AssetImage(asset), fit: BoxFit.fitHeight)),
         child: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
@@ -82,8 +178,7 @@ class CommunityCard extends StatelessWidget {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 20),
-                        child: Text(
-                            'Bruce D. Nesbitt African American Cultural Center',
+                        child: Text(fullName,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -96,7 +191,10 @@ class CommunityCard extends StatelessWidget {
                           color: Colors.white,
                           onPressed: () => Navigator.push(context,
                                   CupertinoPageRoute(builder: (context) {
-                                return CommunityInfoPage();
+                                return CommunityInfoPage(
+                                  title: name,
+                                  json: json,
+                                );
                               })),
                           child: Text('Visit', style: TextStyle())),
                     ),
