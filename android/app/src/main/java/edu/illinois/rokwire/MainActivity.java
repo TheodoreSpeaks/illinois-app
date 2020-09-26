@@ -34,7 +34,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.arubanetworks.meridian.Meridian;
-import com.google.firebase.FirebaseApp;
+// import com.google.firebase.FirebaseApp;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -570,8 +570,8 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
                     result.success("allowed"); // bluetooth is always enabled in Android by default
                     break;
                 case Constants.FIREBASE_INFO:
-                    String projectId = FirebaseApp.getInstance().getOptions().getProjectId();
-                    result.success(projectId);
+                    // String projectId = FirebaseApp.getInstance().getOptions().getProjectId();
+                    // result.success(projectId);
                     break;
                 case Constants.GEOFENCE_KEY:
                     Object resultParams = handleGeofence(methodCall.arguments);

@@ -27,9 +27,10 @@ import 'package:illinois/service/Storage.dart';
 import 'package:illinois/utils/Utils.dart';
 
 class LiveStats with Service implements NotificationsListener {
-
-  static const String notifyLiveGamesLoaded   = "edu.illinois.rokwire.livestats.games.loaded";
-  static const String notifyLiveGamesUpdated  = "edu.illinois.rokwire.livestats.games.updated";
+  static const String notifyLiveGamesLoaded =
+      "edu.illinois.rokwire.livestats.games.loaded";
+  static const String notifyLiveGamesUpdated =
+      "edu.illinois.rokwire.livestats.games.updated";
 
   LiveStats._internal();
   static final LiveStats _logic = new LiveStats._internal();
@@ -47,7 +48,7 @@ class LiveStats with Service implements NotificationsListener {
   void createService() {
     NotificationService().subscribe(this, [
       AppLivecycle.notifyStateChanged,
-      FirebaseMessaging.notifyScoreMessage
+      // FirebaseMessaging.notifyScoreMessage
     ]);
   }
 
@@ -58,7 +59,7 @@ class LiveStats with Service implements NotificationsListener {
 
   @override
   Future<void> initService() async {
-    if(_enabled) {
+    if (_enabled) {
       _loadLiveGames();
     }
   }
@@ -69,9 +70,8 @@ class LiveStats with Service implements NotificationsListener {
   }
 
   bool hasLiveGame(String gameId) {
-    if(_enabled) {
-      if (_liveGames == null)
-        return false;
+    if (_enabled) {
+      if (_liveGames == null) return false;
 
       for (LiveGame current in _liveGames) {
         if (current.gameId == gameId) {
@@ -83,9 +83,8 @@ class LiveStats with Service implements NotificationsListener {
   }
 
   LiveGame getLiveGame(String gameId) {
-    if(_enabled) {
-      if (_liveGames == null)
-        return null;
+    if (_enabled) {
+      if (_liveGames == null) return null;
 
       for (LiveGame current in _liveGames) {
         if (current.gameId == gameId) {
@@ -97,13 +96,13 @@ class LiveStats with Service implements NotificationsListener {
   }
 
   void refresh() {
-    if(_enabled) {
+    if (_enabled) {
       _loadLiveGames();
     }
   }
 
   void addTopic(String topic) {
-    if(_enabled) {
+    if (_enabled) {
       //1. subscribe to Firebase
       FirebaseMessaging().subscribeToTopic(topic).then((bool success) {
         if (success) {
@@ -118,7 +117,7 @@ class LiveStats with Service implements NotificationsListener {
   }
 
   void removeTopic(String topic) {
-    if(_enabled) {
+    if (_enabled) {
       //1. remove it from the current topics
       int currentCount = _currentTopics[topic];
       _currentTopics[topic] = currentCount - 1;
@@ -132,14 +131,12 @@ class LiveStats with Service implements NotificationsListener {
   void _onScoreChanged(Map<String, dynamic> newScore) {
     Log.d("On live game changed");
 
-     LiveGame liveGame = LiveGame.fromJson(newScore);
-     if (liveGame != null)
-       _updateLiveGame(liveGame);
+    LiveGame liveGame = LiveGame.fromJson(newScore);
+    if (liveGame != null) _updateLiveGame(liveGame);
   }
 
   void _updateLiveGame(LiveGame liveGame) {
-    if (_liveGames == null)
-      _liveGames = List();
+    if (_liveGames == null) _liveGames = List();
 
     //1. find the item index
     int itemIndex = -1;
@@ -162,7 +159,9 @@ class LiveStats with Service implements NotificationsListener {
   }
 
   void _loadLiveGames() {
-    String url = (Config().sportsServiceUrl != null) ? "${Config().sportsServiceUrl}/api/livestats" : null;
+    String url = (Config().sportsServiceUrl != null)
+        ? "${Config().sportsServiceUrl}/api/livestats"
+        : null;
     var response = Network().get(url, auth: NetworkAuth.App);
     response.then((response) {
       if ((response != null) && (response.statusCode == 200)) {
@@ -190,16 +189,15 @@ class LiveStats with Service implements NotificationsListener {
   bool get _enabled => AppString.isStringNotEmpty(Config().sportsServiceUrl);
 
   // NotificationsListener
-  
+
   @override
   void onNotification(String name, dynamic param) {
-    if(_enabled) {
+    if (_enabled) {
       if (name == AppLivecycle.notifyStateChanged) {
         if (param == AppLifecycleState.resumed) {
           _loadLiveGames();
         }
-      }
-      else if (name == FirebaseMessaging.notifyScoreMessage) {
+      } else if (name == FirebaseMessaging.notifyScoreMessage) {
         _onScoreChanged(param);
       }
     }

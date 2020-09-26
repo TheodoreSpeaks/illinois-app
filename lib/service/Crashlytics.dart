@@ -14,47 +14,47 @@
  * limitations under the License.
  */
 
-import 'package:firebase_crashlytics/firebase_crashlytics.dart' as Firebase;
-import 'package:flutter/material.dart';
-import 'package:illinois/service/Service.dart';
+// import 'package:firebase_crashlytics/firebase_crashlytics.dart' as Firebase;
+// import 'package:flutter/material.dart';
+// import 'package:illinois/service/Service.dart';
 
-class Crashlytics with Service {
-  static final Crashlytics _crashlytics = new Crashlytics._internal();
+// class Crashlytics with Service {
+//   static final Crashlytics _crashlytics = new Crashlytics._internal();
 
-  factory Crashlytics() {
-    return _crashlytics;
-  }
+//   factory Crashlytics() {
+//     return _crashlytics;
+//   }
 
-  Crashlytics._internal();
+//   Crashlytics._internal();
 
-  @override
-  void createService() {
-    // Set `enableInDevMode` to true to see reports while in debug mode
-    // This is only to be used for confirming that reports are being
-    // submitted as expected. It is not intended to be used for everyday
-    // development.
-    Firebase.Crashlytics.instance.enableInDevMode = false;
+//   @override
+//   void createService() {
+//     // Set `enableInDevMode` to true to see reports while in debug mode
+//     // This is only to be used for confirming that reports are being
+//     // submitted as expected. It is not intended to be used for everyday
+//     // development.
+//     // Firebase.Crashlytics.instance.enableInDevMode = false;
 
-    // Pass all uncaught errors to Firebase.Crashlytics.
-    FlutterError.onError = handleFlutterError;
-  }
+//     // Pass all uncaught errors to Firebase.Crashlytics.
+//     FlutterError.onError = handleFlutterError;
+//   }
 
-  void handleFlutterError(FlutterErrorDetails details) {
-    FlutterError.dumpErrorToConsole(details);
-    Firebase.Crashlytics.instance.recordFlutterError(details);
-  }
+//   void handleFlutterError(FlutterErrorDetails details) {
+//     FlutterError.dumpErrorToConsole(details);
+//     // Firebase.Crashlytics.instance.recordFlutterError(details);
+//   }
 
-  void handleZoneError(dynamic exception, StackTrace stack) {
-    print(exception);
-    Firebase.Crashlytics.instance.recordError(exception, stack);
-  }
+//   void handleZoneError(dynamic exception, StackTrace stack) {
+//     print(exception);
+//     // Firebase.Crashlytics.instance.recordError(exception, stack);
+//   }
 
-  void recordError(dynamic exception, StackTrace stack) {
-    print(exception);
-    Firebase.Crashlytics.instance.recordError(exception, stack);
-  }
+//   void recordError(dynamic exception, StackTrace stack) {
+//     print(exception);
+//     // Firebase.Crashlytics.instance.recordError(exception, stack);
+//   }
 
-  void log(String message) {
-    Firebase.Crashlytics.instance.log(message);
-  }
-}
+//   void log(String message) {
+//     // Firebase.Crashlytics.instance.log(message);
+//   }
+// }

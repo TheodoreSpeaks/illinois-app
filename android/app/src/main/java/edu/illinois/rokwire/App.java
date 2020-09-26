@@ -34,7 +34,7 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugins.GeneratedPluginRegistrant;
-import io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingService;
+// import io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingService;
 
 public class App extends FlutterApplication implements PluginRegistry.PluginRegistrantCallback, LifecycleObserver {
 
@@ -52,7 +52,7 @@ public class App extends FlutterApplication implements PluginRegistry.PluginRegi
     }
 
     private void init() {
-        FlutterFirebaseMessagingService.setPluginRegistrant(this);
+        // FlutterFirebaseMessagingService.setPluginRegistrant(this);
     }
 
     @Override

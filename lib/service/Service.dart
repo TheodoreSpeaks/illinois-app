@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import 'package:illinois/service/Analytics.dart';
 import 'package:illinois/service/AppDateTime.dart';
 import 'package:illinois/service/AppLivecycle.dart';
@@ -46,18 +45,13 @@ import 'package:illinois/service/User.dart';
 import 'package:illinois/service/Voter.dart';
 
 abstract class Service {
-  
-  void createService() {
-  }
+  void createService() {}
 
-  void destroyService() {
-  }
+  void destroyService() {}
 
-  Future<void> initService() async {
-  }
+  Future<void> initService() async {}
 
-  void initServiceUI() async {
-  }
+  void initServiceUI() async {}
 
   Set<Service> get serviceDependsOn {
     return null;
@@ -66,21 +60,20 @@ abstract class Service {
 
 class Services {
   static final Services _instance = Services._internal();
-  
+
   factory Services() {
     return _instance;
   }
 
   Services._internal();
-  
+
   static Services get instance {
     return _instance;
   }
 
   List<Service> _services = [
     // Add highest priority services at top
-    
-    Crashlytics(),
+
     Storage(),
     Config(),
 
@@ -111,7 +104,7 @@ class Services {
     Polls(),
     GeoFence(),
     Voter(),
-    
+
     // These do not rely on Service initialization API so they are not registered as services.
     // LaundryService(),
     // ImageService(),
@@ -144,13 +137,12 @@ class Services {
   }
 
   void _sort() {
-    
     List<Service> queue = List();
     while (_services.isNotEmpty) {
       // start with lowest priority service
       Service svc = _services.last;
       _services.removeLast();
-      
+
       // Move to TBD anyone from Queue that depends on svc
       Set<Service> svcDependents = svc.serviceDependsOn;
       if (svcDependents != null) {
@@ -166,9 +158,7 @@ class Services {
       // Move svc from TBD to Queue, mark it as processed
       queue.add(svc);
     }
-    
+
     _services = queue.reversed.toList();
   }
-
 }
-

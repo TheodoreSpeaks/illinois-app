@@ -42,7 +42,6 @@ import 'package:illinois/service/Styles.dart';
 final AppExitListener appExitListener = AppExitListener();
 
 void main() async {
-
   // https://stackoverflow.com/questions/57689492/flutter-unhandled-exception-servicesbinding-defaultbinarymessenger-was-accesse
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -56,31 +55,31 @@ void main() async {
   // Log app create analytics event
   Analytics().logLivecycle(name: Analytics.LogLivecycleEventCreate);
 
-  runZonedGuarded(() async {
-    runApp(App());
-  }, Crashlytics().handleZoneError);
+  // runZonedGuarded(() async {
+  runApp(App());
+  // // }, Crashlytics().handleZoneError);
 }
 
 Future<void> _init() async {
-  NotificationService().subscribe(appExitListener, AppLivecycle.notifyStateChanged);
+  NotificationService()
+      .subscribe(appExitListener, AppLivecycle.notifyStateChanged);
 
   Services().create();
   await Services().init();
 }
 
 Future<void> _destroy() async {
-
   NotificationService().unsubscribe(appExitListener);
 
   Services().destroy();
 }
 
 class AppExitListener implements NotificationsListener {
-  
   // NotificationsListener
   @override
   void onNotification(String name, param) {
-    if ((name == AppLivecycle.notifyStateChanged) && (param == AppLifecycleState.detached)) {
+    if ((name == AppLivecycle.notifyStateChanged) &&
+        (param == AppLifecycleState.detached)) {
       Future.delayed(Duration(), () {
         _destroy();
       });
@@ -93,7 +92,6 @@ class _AppData {
 }
 
 class App extends StatefulWidget {
-
   final _AppData _data = _AppData();
   static App _instance;
 
@@ -115,7 +113,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> implements NotificationsListener {
-
   RootPanel rootPanel;
   String _upgradeRequiredVersion;
   String _upgradeAvailableVersion;
@@ -140,7 +137,7 @@ class _AppState extends State<App> implements NotificationsListener {
     rootPanel = RootPanel();
     _upgradeRequiredVersion = Config().upgradeRequiredVersion;
     _upgradeAvailableVersion = Config().upgradeAvailableVersion;
-    
+
     // This is just a placeholder to take some action on app upgrade.
     String lastRunVersion = Storage().lastRunVersion;
     if ((lastRunVersion == null) || (lastRunVersion != Config().appVersion)) {
@@ -171,7 +168,7 @@ class _AppState extends State<App> implements NotificationsListener {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: Localization().supportedLocales(),
-      navigatorObservers:[AppNavigation()],
+      navigatorObservers: [AppNavigation()],
       //onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       title: Localization().getStringEx('app.title', 'Illinois'),
       theme: ThemeData(
@@ -183,21 +180,23 @@ class _AppState extends State<App> implements NotificationsListener {
 
   Widget get _homePanel {
     if (_upgradeRequiredVersion != null) {
-      return OnboardingUpgradePanel(requiredVersion:_upgradeRequiredVersion);
-    }
-    else if (_upgradeAvailableVersion != null) {
-      return OnboardingUpgradePanel(availableVersion:_upgradeAvailableVersion);
-    }
-    else if (!Storage().onBoardingPassed) {
+      return OnboardingUpgradePanel(requiredVersion: _upgradeRequiredVersion);
+    } else if (_upgradeAvailableVersion != null) {
+      return OnboardingUpgradePanel(availableVersion: _upgradeAvailableVersion);
+    } else if (!Storage().onBoardingPassed) {
       return Onboarding().startPanel;
-    }
-    else if ((Storage().privacyUpdateVersion == null) || (AppVersion.compareVersions(Storage().privacyUpdateVersion, Config().appPrivacyVersion) < 0)) {
-      return SettingsPrivacyPanel(mode: SettingsPrivacyPanelMode.update,);
-    }
-    else if (User().privacyLevel == null) {
-      return SettingsPrivacyPanel(mode: SettingsPrivacyPanelMode.update,); // regular?
-    }
-    else {
+    } else if ((Storage().privacyUpdateVersion == null) ||
+        (AppVersion.compareVersions(
+                Storage().privacyUpdateVersion, Config().appPrivacyVersion) <
+            0)) {
+      return SettingsPrivacyPanel(
+        mode: SettingsPrivacyPanelMode.update,
+      );
+    } else if (User().privacyLevel == null) {
+      return SettingsPrivacyPanel(
+        mode: SettingsPrivacyPanelMode.update,
+      ); // regular?
+    } else {
       return rootPanel;
     }
   }
@@ -221,30 +220,24 @@ class _AppState extends State<App> implements NotificationsListener {
   void onNotification(String name, dynamic param) {
     if (name == Onboarding.notifyFinished) {
       _finishOnboarding(param);
-    }
-    else if (name == Config.notifyUpgradeRequired) {
+    } else if (name == Config.notifyUpgradeRequired) {
       setState(() {
         _upgradeRequiredVersion = param;
       });
-    }
-    else if (name == Config.notifyUpgradeAvailable) {
+    } else if (name == Config.notifyUpgradeAvailable) {
       setState(() {
         _upgradeAvailableVersion = param;
       });
-    }
-    else if (name == User.notifyUserDeleted) {
+    } else if (name == User.notifyUserDeleted) {
       _resetUI();
-    }
-    else if (name == Storage.notifySettingChanged) {
+    } else if (name == Storage.notifySettingChanged) {
       if (param == Storage.privacyUpdateVersionKey) {
-        setState(() { });
+        setState(() {});
       }
-    }
-    else if (name == User.notifyPrivacyLevelChanged) {
-      setState(() { });
-    }
-    else if (name == User.notifyPrivacyLevelEmpty) {
-      setState(() { });
+    } else if (name == User.notifyPrivacyLevelChanged) {
+      setState(() {});
+    } else if (name == User.notifyPrivacyLevelEmpty) {
+      setState(() {});
     }
   }
 }
