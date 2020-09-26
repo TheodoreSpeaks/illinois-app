@@ -49,22 +49,22 @@ class CommunityInfoPage extends StatelessWidget {
               },
               icon: Icon(Icons.message, color: Colors.white),
             ),
-            IconButton(
-              icon: Icon(
-                Icons.videocam,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                  return ArtSplashPage(
-                    name: title,
-                    splashInfo: splashInfo,
-                  );
-                }));
+            // IconButton(
+            //   icon: Icon(
+            //     Icons.videocam,
+            //     color: Colors.white,
+            //   ),
+            //   onPressed: () {
+            //     Navigator.push(context, CupertinoPageRoute(builder: (context) {
+            //       return ArtSplashPage(
+            //         name: title,
+            //         splashInfo: splashInfo,
+            //       );
+            //     }));
 
-                // onJoin(context);
-              },
-            )
+            //     // onJoin(context);
+            //   },
+            // )
           ],
         ),
         bottomNavigationBar: TabBarWidget(),

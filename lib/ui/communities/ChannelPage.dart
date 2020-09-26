@@ -35,6 +35,13 @@ class ChannelPage extends StatelessWidget {
               ChannelCard(
                 messagePage: MessagePage(
                   splashInfo: splashInfo,
+                  children: [
+                    ChatBubble(
+                      user: 'Joe Sousa',
+                      text:
+                          'Need any help, or just want a general virtual tour? Just ask me!',
+                    )
+                  ],
                 ),
               ),
               ChannelCard(
@@ -42,12 +49,35 @@ class ChannelPage extends StatelessWidget {
                 description: 'Hop on in and have a chat!',
                 messagePage: MessagePage(
                   splashInfo: splashInfo,
+                  children: [
+                    ChatBubble(
+                      user: 'Angie Shaw',
+                      text: 'Anybody else doing pyghack? Looking for a team!',
+                    ),
+                    ChatBubbleUser(
+                      text: 'Wish they delivered food im hungry :(',
+                    ),
+                    ChatBubble(
+                      user: 'Ryan Prendergast',
+                      text: 'Can you guys hear me? My internet is cutting out',
+                    ),
+                    ChatBubbleUser(
+                      text: 'Maybe try turning off your video',
+                    ),
+                    ChatBubble(
+                      user: 'Ryan Prendergast',
+                      text: 'AGHHHHHHH',
+                    ),
+                    ChatBubbleUser(
+                      text: 'This app is the best',
+                    ),
+                  ],
                 ),
               ),
               ChannelCard(
                 text: 'RSO meetings',
                 description: 'Our weekly RSO meeting',
-                time: '3-4 pm Wednesdays',
+                time: '7-8 pm Tuesdays',
                 messagePage: MessagePage(
                   splashInfo: splashInfo,
                 ),
@@ -58,6 +88,16 @@ class ChannelPage extends StatelessWidget {
                 time: '5-6 pm Saturdays',
                 messagePage: MessagePage(
                   splashInfo: splashInfo,
+                  children: [
+                    ChatBubble(
+                        text: 'ill be here for an hour if you need any help',
+                        user: 'Sarah Bishop'),
+                    ChatBubble(
+                        text: 'Hey, can you talk', user: 'Ryan Prendergast'),
+                    ChatBubble(
+                        text: 'Sure, join the video chat!',
+                        user: 'Sarah Bishop'),
+                  ],
                 ),
               )
             ],
