@@ -37,17 +37,16 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FlexUI with Service implements NotificationsListener {
+  static const String notifyChanged = "edu.illinois.rokwire.flexui.changed";
 
-  static const String notifyChanged  = "edu.illinois.rokwire.flexui.changed";
-
-  static const String _flexUIName   = "flexUI.json";
+  static const String _flexUIName = "flexUI.json";
 
   Map<String, dynamic> _content;
-  Set<dynamic>         _features;
-  Http.Client          _httpClient;
-  String               _dataVersion;
-  File                 _cacheFile;
-  DateTime             _pausedDateTime;
+  Set<dynamic> _features;
+  Http.Client _httpClient;
+  String _dataVersion;
+  File _cacheFile;
+  DateTime _pausedDateTime;
 
   // Singleton Factory
 
@@ -66,7 +65,7 @@ class FlexUI with Service implements NotificationsListener {
 
   @override
   void createService() {
-    NotificationService().subscribe(this,[
+    NotificationService().subscribe(this, [
       User.notifyUserUpdated,
       User.notifyRolesUpdated,
       User.notifyPrivacyLevelChanged,
@@ -90,10 +89,9 @@ class FlexUI with Service implements NotificationsListener {
     _content = await _loadContentFromCache();
     if (_content == null) {
       await _initFromNet();
-    }
-    else {
+    } else {
       _features = _buildFeatures(_content);
-      _updateFromNet();
+      // _updateFromNet();
     }
   }
 
@@ -110,22 +108,19 @@ class FlexUI with Service implements NotificationsListener {
         (name == User.notifyRolesUpdated) ||
         (name == User.notifyPrivacyLevelChanged) ||
         (name == Auth.notifyAuthTokenChanged) ||
-        (name == Auth.notifyCardChanged) || 
+        (name == Auth.notifyCardChanged) ||
         (name == Auth.notifyUserPiiDataChanged) ||
-        (name == IlliniCash.notifyBallanceUpdated))
-    {
+        (name == IlliniCash.notifyBallanceUpdated)) {
       _updateFromNet();
-    }
-    else if (name == AppLivecycle.notifyStateChanged) {
-     _onAppLivecycleStateChanged(param); 
+    } else if (name == AppLivecycle.notifyStateChanged) {
+      _onAppLivecycleStateChanged(param);
     }
   }
 
   void _onAppLivecycleStateChanged(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       _pausedDateTime = DateTime.now();
-    }
-    else if (state == AppLifecycleState.resumed) {
+    } else if (state == AppLifecycleState.resumed) {
       if (_pausedDateTime != null) {
         Duration pausedDuration = DateTime.now().difference(_pausedDateTime);
         if (Config().refreshTimeout < pausedDuration.inSeconds) {
@@ -144,7 +139,9 @@ class FlexUI with Service implements NotificationsListener {
   }
 
   Future<String> _loadContentStringFromCache() async {
-    return ((_cacheFile != null) && await _cacheFile.exists()) ? await _cacheFile.readAsString() : null;
+    return ((_cacheFile != null) && await _cacheFile.exists())
+        ? await _cacheFile.readAsString()
+        : null;
   }
 
   Future<void> _saveContentStringToCache(String contentString) async {
@@ -156,18 +153,18 @@ class FlexUI with Service implements NotificationsListener {
   }
 
   Future<String> _loadContentStringFromNet() async {
-
     //TMP: try { return AppJson.encode(await _localBuild()); } catch (e) { print(e.toString()); }
 
     Http.Client httpClient;
-    
+
     if (_httpClient != null) {
       _httpClient.close();
       _httpClient = null;
     }
 
-    String url = '${Config().talentChooserUrl}/ui-content?data-version=$_dataVersion';
-    
+    String url =
+        '${Config().talentChooserUrl}/ui-content?data-version=$_dataVersion';
+
     Map<String, dynamic> post = {
       'user': User().data?.toShortJson(),
       'auth_token': Auth().authToken?.toJson(),
@@ -177,19 +174,22 @@ class FlexUI with Service implements NotificationsListener {
       'illini_cash': IlliniCash().ballance?.toJson(),
       'platform': platformJson,
     };
-    
+
     try {
       String body = json.encode(post);
       _httpClient = httpClient = Http.Client();
-      Http.Response response = await Network().get(url, body:body, auth: NetworkAuth.App, client: _httpClient);
+      Http.Response response = await Network()
+          .get(url, body: body, auth: NetworkAuth.App, client: _httpClient);
       int responseCode = response?.statusCode ?? -1;
       String responseBody = response?.body;
-      Log.d('FlexUI: GET $url\n$body\nResponse $responseCode:\n$responseBody\n');
-      return ((response != null) && (responseCode == 200)) ? responseBody : null;
+      Log.d(
+          'FlexUI: GET $url\n$body\nResponse $responseCode:\n$responseBody\n');
+      return ((response != null) && (responseCode == 200))
+          ? responseBody
+          : null;
     } catch (e) {
       print(e.toString());
-    }
-    finally {
+    } finally {
       if (_httpClient == httpClient) {
         _httpClient = null;
       }
@@ -226,7 +226,9 @@ class FlexUI with Service implements NotificationsListener {
       jsonString = AppJson.encode(content);
     }
 
-    if ((content != null) && ((_content == null) || !DeepCollectionEquality().equals(_content, content))) {
+    if ((content != null) &&
+        ((_content == null) ||
+            !DeepCollectionEquality().equals(_content, content))) {
       _content = content;
       _saveContentStringToCache(jsonString);
 
@@ -246,7 +248,7 @@ class FlexUI with Service implements NotificationsListener {
 
   static Map<String, dynamic> get platformJson {
     return {
-        'os': Platform.operatingSystem,
+      'os': Platform.operatingSystem,
     };
   }
 
@@ -294,8 +296,8 @@ class FlexUI with Service implements NotificationsListener {
     return result;
   }
 
-  static bool _localeIsEntryAvailable(String entry, { String group, Map<String, dynamic> rules }) {
-
+  static bool _localeIsEntryAvailable(String entry,
+      {String group, Map<String, dynamic> rules}) {
     if (rules == null) {
       rules = Assets()['flex_ui.rules'];
     }
@@ -303,68 +305,84 @@ class FlexUI with Service implements NotificationsListener {
     String pathEntry = (group != null) ? '$group.$entry' : null;
 
     Map<String, dynamic> roleRules = rules['roles'];
-    dynamic roleRule = (roleRules != null) ? (((pathEntry != null) ? roleRules[pathEntry] : null) ?? roleRules[entry]) : null;
+    dynamic roleRule = (roleRules != null)
+        ? (((pathEntry != null) ? roleRules[pathEntry] : null) ??
+            roleRules[entry])
+        : null;
     if ((roleRule != null) && !_localeEvalRoleRule(roleRule)) {
       return false;
     }
 
     Map<String, dynamic> privacyRules = rules['privacy'];
-    dynamic privacyRule = (privacyRules != null) ? (((pathEntry != null) ? privacyRules[pathEntry] : null) ?? privacyRules[entry]) : null;
+    dynamic privacyRule = (privacyRules != null)
+        ? (((pathEntry != null) ? privacyRules[pathEntry] : null) ??
+            privacyRules[entry])
+        : null;
     if ((privacyRule != null) && !_localeEvalPrivacyRule(privacyRule)) {
       return false;
     }
-    
+
     Map<String, dynamic> authRules = rules['auth'];
-    dynamic authRule = (authRules != null) ? (((pathEntry != null) ? authRules[pathEntry] : null) ?? authRules[entry])  : null;
+    dynamic authRule = (authRules != null)
+        ? (((pathEntry != null) ? authRules[pathEntry] : null) ??
+            authRules[entry])
+        : null;
     if ((authRule != null) && !_localeEvalAuthRule(authRule)) {
       return false;
     }
-    
+
     Map<String, dynamic> platformRules = rules['platform'];
-    dynamic platformRule = (platformRules != null) ? (((pathEntry != null) ? platformRules[pathEntry] : null) ?? platformRules[entry])  : null;
+    dynamic platformRule = (platformRules != null)
+        ? (((pathEntry != null) ? platformRules[pathEntry] : null) ??
+            platformRules[entry])
+        : null;
     if ((platformRule != null) && !_localeEvalPlatformRule(platformRule)) {
       return false;
     }
 
     Map<String, dynamic> illiniCashRules = rules['illini_cash'];
-    dynamic illiniCashRule = (illiniCashRules != null) ? (((pathEntry != null) ? illiniCashRules[pathEntry] : null) ?? illiniCashRules[entry])  : null;
-    if ((illiniCashRule != null) && !_localeEvalIlliniCashRule(illiniCashRule)) {
+    dynamic illiniCashRule = (illiniCashRules != null)
+        ? (((pathEntry != null) ? illiniCashRules[pathEntry] : null) ??
+            illiniCashRules[entry])
+        : null;
+    if ((illiniCashRule != null) &&
+        !_localeEvalIlliniCashRule(illiniCashRule)) {
       return false;
     }
-    
+
     Map<String, dynamic> enableRules = rules['enable'];
-    dynamic enableRule = (enableRules != null) ? (((pathEntry != null) ? enableRules[pathEntry] : null) ?? enableRules[entry])  : null;
+    dynamic enableRule = (enableRules != null)
+        ? (((pathEntry != null) ? enableRules[pathEntry] : null) ??
+            enableRules[entry])
+        : null;
     if ((enableRule != null) && !_localeEvalEnableRule(enableRule)) {
       return false;
     }
-    
+
     return true;
   }
 
   static bool _localeEvalRoleRule(dynamic roleRule) {
-    
     if (roleRule is String) {
-
       if (roleRule == 'TRUE') {
         return true;
       }
       if (roleRule == 'FALSE') {
         return false;
       }
-      
+
       UserRole userRole = UserRole.fromString(roleRule);
       if (userRole != null) {
         Set<UserRole> userRoles = User().roles;
         return (userRoles != null) && (userRoles.contains(userRole));
       }
     }
-    
+
     if (roleRule is List) {
-      
       if (roleRule.length == 1) {
         return _localeEvalRoleRule(roleRule[0]);
       }
-      
+
       if (roleRule.length == 2) {
         dynamic operation = roleRule[0];
         dynamic argument = roleRule[1];
@@ -383,8 +401,7 @@ class FlexUI with Service implements NotificationsListener {
           if (operation is String) {
             if (operation == 'AND') {
               result = result && _localeEvalRoleRule(argument);
-            }
-            else if (operation == 'OR') {
+            } else if (operation == 'OR') {
               result = result || _localeEvalRoleRule(argument);
             }
           }
@@ -392,16 +409,20 @@ class FlexUI with Service implements NotificationsListener {
         return result;
       }
     }
-    
+
     return true; // allow everything that is not defined or we do not understand
   }
 
   static bool _localeEvalIlliniCashRule(dynamic illiniCashRule) {
-    bool result = true;  // allow everything that is not defined or we do not understand
+    bool result =
+        true; // allow everything that is not defined or we do not understand
     if (illiniCashRule is Map) {
       illiniCashRule.forEach((dynamic key, dynamic value) {
-        if ((key is String) && (key == 'housingResidenceStatus') && (value is bool)) {
-           result = result && (IlliniCash().ballance?.housingResidenceStatus ?? false);
+        if ((key is String) &&
+            (key == 'housingResidenceStatus') &&
+            (value is bool)) {
+          result = result &&
+              (IlliniCash().ballance?.housingResidenceStatus ?? false);
         }
       });
     }
@@ -409,42 +430,37 @@ class FlexUI with Service implements NotificationsListener {
   }
 
   static bool _localeEvalPrivacyRule(dynamic privacyRule) {
-    return (privacyRule is int) ? User().privacyMatch(privacyRule) : true; // allow everything that is not defined or we do not understand
+    return (privacyRule is int)
+        ? User().privacyMatch(privacyRule)
+        : true; // allow everything that is not defined or we do not understand
   }
 
   static bool _localeEvalAuthRule(dynamic authRule) {
-    bool result = true;  // allow everything that is not defined or we do not understand
+    bool result =
+        true; // allow everything that is not defined or we do not understand
     if (authRule is Map) {
       authRule.forEach((dynamic key, dynamic value) {
         if (key is String) {
           if ((key == 'loggedIn') && (value is bool)) {
             result = result && (Auth().isLoggedIn == value);
-          }
-          else if ((key == 'shibbolethLoggedIn') && (value is bool)) {
+          } else if ((key == 'shibbolethLoggedIn') && (value is bool)) {
             result = result && (Auth().isShibbolethLoggedIn == value);
-          }
-          else if ((key == 'phoneLoggedIn') && (value is bool)) {
+          } else if ((key == 'phoneLoggedIn') && (value is bool)) {
             result = result && (Auth().isPhoneLoggedIn == value);
-          }
-          
-          else if ((key == 'shibbolethMemberOf') && (value is String)) {
+          } else if ((key == 'shibbolethMemberOf') && (value is String)) {
             result = result && Auth().isMemberOf(value);
-          }
-          else if ((key == 'eventEditor') && (value is bool)) {
+          } else if ((key == 'eventEditor') && (value is bool)) {
             result = result && (Auth().isEventEditor == value);
-          }
-          else if ((key == 'stadiumPollManager') && (value is bool)) {
+          } else if ((key == 'stadiumPollManager') && (value is bool)) {
             result = result && (Auth().isStadiumPollManager == value);
-          }
-          
-          else if ((key == 'iCard') && (value is bool)) {
+          } else if ((key == 'iCard') && (value is bool)) {
             result = result && ((Auth().authCard != null) == value);
-          }
-          else if ((key == 'iCardNum') && (value is bool)) {
-            result = result && ((0 < (Auth().authCard?.cardNumber?.length ?? 0)) == value);
-          }
-          else if ((key == 'iCardLibraryNum') && (value is bool)) {
-            result = result && ((0 < (Auth().authCard?.libraryNumber?.length ?? 0)) == value);
+          } else if ((key == 'iCardNum') && (value is bool)) {
+            result = result &&
+                ((0 < (Auth().authCard?.cardNumber?.length ?? 0)) == value);
+          } else if ((key == 'iCardLibraryNum') && (value is bool)) {
+            result = result &&
+                ((0 < (Auth().authCard?.libraryNumber?.length ?? 0)) == value);
           }
         }
       });
@@ -453,15 +469,15 @@ class FlexUI with Service implements NotificationsListener {
   }
 
   static bool _localeEvalPlatformRule(dynamic platformRule) {
-    bool result = true;  // allow everything that is not defined or we do not understand
+    bool result =
+        true; // allow everything that is not defined or we do not understand
     if (platformRule is Map) {
       platformRule.forEach((dynamic key, dynamic value) {
         if (key is String) {
           if (key == 'os') {
             if (value is List) {
               result = result && value.contains(Platform.operatingSystem);
-            }
-            else if (value is String) {
+            } else if (value is String) {
               result = result && (value == Platform.operatingSystem);
             }
           }
@@ -472,6 +488,8 @@ class FlexUI with Service implements NotificationsListener {
   }
 
   static bool _localeEvalEnableRule(dynamic enableRule) {
-    return (enableRule is bool) ? enableRule : true; // allow everything that is not defined or we do not understand
+    return (enableRule is bool)
+        ? enableRule
+        : true; // allow everything that is not defined or we do not understand
   }
 }

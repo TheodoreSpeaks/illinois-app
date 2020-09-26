@@ -179,26 +179,26 @@ class _AppState extends State<App> implements NotificationsListener {
   }
 
   Widget get _homePanel {
-    if (_upgradeRequiredVersion != null) {
-      return OnboardingUpgradePanel(requiredVersion: _upgradeRequiredVersion);
-    } else if (_upgradeAvailableVersion != null) {
-      return OnboardingUpgradePanel(availableVersion: _upgradeAvailableVersion);
-    } else if (!Storage().onBoardingPassed) {
-      return Onboarding().startPanel;
-    } else if ((Storage().privacyUpdateVersion == null) ||
-        (AppVersion.compareVersions(
-                Storage().privacyUpdateVersion, Config().appPrivacyVersion) <
-            0)) {
-      return SettingsPrivacyPanel(
-        mode: SettingsPrivacyPanelMode.update,
-      );
-    } else if (User().privacyLevel == null) {
-      return SettingsPrivacyPanel(
-        mode: SettingsPrivacyPanelMode.update,
-      ); // regular?
-    } else {
-      return rootPanel;
-    }
+    // if (_upgradeRequiredVersion != null) {
+    //   return OnboardingUpgradePanel(requiredVersion: _upgradeRequiredVersion);
+    // } else if (_upgradeAvailableVersion != null) {
+    //   return OnboardingUpgradePanel(availableVersion: _upgradeAvailableVersion);
+    // } else if (!Storage().onBoardingPassed) {
+    //   return Onboarding().startPanel;
+    // } else if ((Storage().privacyUpdateVersion == null) ||
+    //     (AppVersion.compareVersions(
+    //             Storage().privacyUpdateVersion, Config().appPrivacyVersion) <
+    //         0)) {
+    //   return SettingsPrivacyPanel(
+    //     mode: SettingsPrivacyPanelMode.update,
+    //   );
+    // } else if (User().privacyLevel == null) {
+    //   return SettingsPrivacyPanel(
+    //     mode: SettingsPrivacyPanelMode.update,
+    //   ); // regular?
+    // } else {
+    return rootPanel;
+    // }
   }
 
   void _resetUI() async {

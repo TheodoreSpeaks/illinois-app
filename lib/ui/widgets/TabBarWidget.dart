@@ -28,7 +28,6 @@ import 'package:illinois/ui/wallet/WalletSheet.dart';
 import 'package:illinois/service/Styles.dart';
 
 class TabBarWidget extends StatefulWidget {
-
   static double tabBarHeight = 60;
   static double tabTextSize = 12;
 
@@ -39,8 +38,8 @@ class TabBarWidget extends StatefulWidget {
   _TabBarWidgetState createState() => _TabBarWidgetState();
 }
 
-class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsListener {
-
+class _TabBarWidgetState extends State<TabBarWidget>
+    implements NotificationsListener {
   List<dynamic> _contentListCodes;
 
   @override
@@ -49,7 +48,7 @@ class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsLi
 
     NotificationService().subscribe(this, FlexUI.notifyChanged);
 
-    if(widget?.tabController != null) {
+    if (widget?.tabController != null) {
       widget.tabController.addListener(_onTabControllerChanged);
     }
 
@@ -62,7 +61,7 @@ class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsLi
 
     NotificationService().unsubscribe(this);
 
-    if(widget?.tabController != null) {
+    if (widget?.tabController != null) {
       widget.tabController.removeListener(_onTabControllerChanged);
     }
   }
@@ -78,22 +77,28 @@ class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsLi
 
   @override
   Widget build(BuildContext context) {
-    double height = 35 + (TabBarWidget.tabTextSize * (MediaQuery.of(context).textScaleFactor?? 60)); // 35 is icon height + paddings
-    if(TabBarWidget.tabBarHeight < height){
+    double height = 35 +
+        (TabBarWidget.tabTextSize *
+            (MediaQuery.of(context).textScaleFactor ??
+                60)); // 35 is icon height + paddings
+    if (TabBarWidget.tabBarHeight < height) {
       TabBarWidget.tabBarHeight = height;
     }
 
-
     Color backgroundColor;
-    switch(Config().configEnvironment) {
-      case ConfigEnvironment.dev:        backgroundColor = Colors.yellowAccent; break;
-      case ConfigEnvironment.test:       backgroundColor = Colors.lightGreenAccent; break;
-      case ConfigEnvironment.production: backgroundColor = Colors.white; break;
-    }
+    // switch(Config().configEnvironment) {
+    //   case ConfigEnvironment.dev:        backgroundColor = Colors.yellowAccent; break;
+    //   case ConfigEnvironment.test:       backgroundColor = Colors.lightGreenAccent; break;
+    //   case ConfigEnvironment.production: backgroundColor = Colors.white; break;
+    // }
     return Container(
       decoration: BoxDecoration(
           color: backgroundColor,
-          border: Border(top: BorderSide(color: Styles().colors.surfaceAccent, width: 1, style: BorderStyle.solid))),
+          border: Border(
+              top: BorderSide(
+                  color: Styles().colors.surfaceAccent,
+                  width: 1,
+                  style: BorderStyle.solid))),
       child: SafeArea(
         child: Container(
           height: TabBarWidget.tabBarHeight,
@@ -117,43 +122,41 @@ class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsLi
             hint: Localization().getStringEx('tabbar.home.hint', ''),
             iconResource: 'images/tab-home.png',
             iconResourceSelected: 'images/tab-home-selected.png',
-            selected: (widget?.tabController != null) && (widget.tabController.index == tabIndex),
-            onTap: ()=>_onSwitchTab(context, tabIndex),
+            selected: (widget?.tabController != null) &&
+                (widget.tabController.index == tabIndex),
+            onTap: () => _onSwitchTab(context, tabIndex),
           ),
         ));
-      }
-      else if (code == 'explore') {
+      } else if (code == 'explore') {
         tabs.add(Expanded(
-          child: TabWidget(
-            label: Localization().getStringEx('tabbar.explore.title', 'Explore'),
-            hint: Localization().getStringEx('tabbar.explore.hint', ''),
-            iconResource: 'images/tab-explore.png',
-            iconResourceSelected: 'images/tab-explore-selected.png',
-            selected: (widget?.tabController != null) && (widget.tabController.index == tabIndex),
-            onTap: ()=>_onSwitchTab(context, tabIndex),
-          )
-        ));
-      }
-      else if (code == 'wallet') {
+            child: TabWidget(
+          label: Localization().getStringEx('tabbar.explore.title', 'Explore'),
+          hint: Localization().getStringEx('tabbar.explore.hint', ''),
+          iconResource: 'images/tab-explore.png',
+          iconResourceSelected: 'images/tab-explore-selected.png',
+          selected: (widget?.tabController != null) &&
+              (widget.tabController.index == tabIndex),
+          onTap: () => _onSwitchTab(context, tabIndex),
+        )));
+      } else if (code == 'wallet') {
         tabs.add(Expanded(
-          child: TabWidget(
-            label: Localization().getStringEx('tabbar.wallet.title', 'Wallet'),
-            hint: Localization().getStringEx('tabbar.wallet.hint', ''),
-            iconResource: 'images/tab-wallet.png',
-            selected: false,
-            onTap: ()=>_onShowWalletSheet(context),
-          )
-        ));
-      }
-      else if (code == 'browse') {
+            child: TabWidget(
+          label: Localization().getStringEx('tabbar.wallet.title', 'Wallet'),
+          hint: Localization().getStringEx('tabbar.wallet.hint', ''),
+          iconResource: 'images/tab-wallet.png',
+          selected: false,
+          onTap: () => _onShowWalletSheet(context),
+        )));
+      } else if (code == 'browse') {
         tabs.add(Expanded(
           child: TabWidget(
             label: Localization().getStringEx('tabbar.browse.title', 'Browse'),
             hint: Localization().getStringEx('tabbar.browse.hint', ''),
             iconResource: 'images/tab-browse.png',
             iconResourceSelected: 'images/tab-browse-selected.png',
-            selected: (widget?.tabController != null) && (widget.tabController.index == tabIndex),
-            onTap: ()=>_onSwitchTab(context, tabIndex),
+            selected: (widget?.tabController != null) &&
+                (widget.tabController.index == tabIndex),
+            onTap: () => _onSwitchTab(context, tabIndex),
           ),
         ));
       }
@@ -161,12 +164,13 @@ class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsLi
     return tabs;
   }
 
-  void _onTabControllerChanged(){
+  void _onTabControllerChanged() {
     setState(() {});
   }
 
-  void _onSwitchTab(BuildContext context, int tabIndex){
-    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+  void _onSwitchTab(BuildContext context, int tabIndex) {
+    Navigator.of(context, rootNavigator: true)
+        .popUntil((route) => route.isFirst);
     var rootPanel = App.instance?.panelState?.rootPanel;
     if (rootPanel != null) {
       RootTab tab = rootPanel.panelState?.getRootTabByIndex(tabIndex);
@@ -174,25 +178,24 @@ class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsLi
     }
   }
 
-  void _onShowWalletSheet(BuildContext context){
-    showModalBottomSheet(context: context,
+  void _onShowWalletSheet(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
         isScrollControlled: true,
         isDismissible: true,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24.0),
         ),
-        builder: (context){
+        builder: (context) {
           return WalletSheet();
-        }
-    );
+        });
   }
 
   List<String> _getContentListCodes() {
     try {
       dynamic tabsList = FlexUI()['tabbar'];
       return (tabsList is List) ? tabsList.cast<String>() : null;
-    }
-    catch(e) {
+    } catch (e) {
       print(e.toString());
     }
     return null;
@@ -200,7 +203,8 @@ class _TabBarWidgetState extends State<TabBarWidget>  implements NotificationsLi
 
   void _updateContentListCodes() {
     List<String> contentListCodes = _getContentListCodes();
-    if ((contentListCodes != null) ?? !DeepCollectionEquality().equals(_contentListCodes, contentListCodes)) {
+    if ((contentListCodes != null) ??
+        !DeepCollectionEquality().equals(_contentListCodes, contentListCodes)) {
       setState(() {
         _contentListCodes = contentListCodes;
       });
@@ -253,28 +257,34 @@ class TabWidget extends StatelessWidget {
                                   : AssetImage(iconResource)),
                               width: 20.0,
                               height: 20.0)),
-                      Expanded(child:
-                      Text(
+                      Expanded(
+                          child: Text(
                         label,
                         textScaleFactor: scaleFactor,
                         style: TextStyle(
                             fontFamily: Styles().fontFamilies.bold,
-                            color: selected ? Styles().colors.fillColorSecondary : Styles().colors.mediumGray,
+                            color: selected
+                                ? Styles().colors.fillColorSecondary
+                                : Styles().colors.mediumGray,
                             fontSize: TabBarWidget.tabTextSize),
-                      )
-                      )
+                      ))
                     ],
                   ),
                 )),
           ),
-          selected ? Positioned.fill(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(height: 4, color: Styles().colors.fillColorSecondary,)
-              ],
-            ),
-          ) : Container(),
+          selected
+              ? Positioned.fill(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        height: 4,
+                        color: Styles().colors.fillColorSecondary,
+                      )
+                    ],
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
