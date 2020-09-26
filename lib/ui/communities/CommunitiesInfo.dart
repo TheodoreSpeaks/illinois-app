@@ -10,6 +10,7 @@ import 'package:illinois/ui/widgets/HeaderBar.dart';
 import 'package:illinois/ui/widgets/TabBarWidget.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'ChannelPage.dart';
 import 'CommunityExploreCard.dart';
 import 'MessagePage.dart';
 
@@ -48,7 +49,7 @@ class CommunityInfoPage extends StatelessWidget {
             IconButton(
               onPressed: () {
                 Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                  return MessagePage();
+                  return ChannelPage();
                 }));
               },
               icon: Icon(Icons.message, color: Colors.white),

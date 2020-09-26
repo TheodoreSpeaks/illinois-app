@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:illinois/service/Styles.dart';
 
-class MessagePage extends StatelessWidget {
+class MessagePage extends StatefulWidget {
+  @override
+  _MessagePageState createState() => _MessagePageState();
+}
+
+class _MessagePageState extends State<MessagePage> {
+  List<Widget> children = [
+    ChatBubble(text: 'Hi guys!', user: 'Angie Smith'),
+    ChatBubble(text: 'Our first meeting will be this Tuesday at 7'),
+    ChatBubble(text: 'See you there!'),
+    ChatBubbleUser(text: 'Sounds good!')
+  ];
+
+  var _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,12 +40,7 @@ class MessagePage extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ChatBubble(text: 'Hi guys!', user: 'Angie Smith'),
-                    ChatBubble(
-                        text: 'Our first meeting will be this Tuesday at 7'),
-                    ChatBubble(text: 'See you there!'),
-                  ],
+                  children: children,
                 ),
               ),
             ),
@@ -45,6 +53,13 @@ class MessagePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all()),
                     child: TextField(
+                      controller: _controller,
+                      onSubmitted: (value) => setState(() {
+                        children.add(ChatBubbleUser(
+                          text: value,
+                        ));
+                        _controller.clear();
+                      }),
                       decoration: InputDecoration(
                           hintText: 'Type message',
                           border: InputBorder.none,
@@ -96,6 +111,39 @@ class ChatBubble extends StatelessWidget {
                       TextStyle(fontWeight: FontWeight.normal, fontSize: 14))),
         ],
       ),
+    );
+  }
+}
+
+class ChatBubbleUser extends StatelessWidget {
+  final String text;
+  const ChatBubbleUser({Key key, this.text}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Spacer(),
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, left: 12.0, right: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                  padding: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: Styles().colors.accentColor1, width: 2)),
+                  child: Text(text,
+                      style: TextStyle(
+                          color: Styles().colors.accentColor1,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14))),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

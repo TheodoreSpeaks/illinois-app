@@ -58,27 +58,15 @@ class CommunitiesPage extends StatelessWidget {
         json: [
           {
             'id': '1',
-            'title': 'MLK Day of Service',
+            'title': "Black and Latina Womxn's Summit",
             'timeString': 'January 18, 2021, 1-4 PM',
-            'imageURL': 'images/mlk.jpg'
+            'imageURL': 'images/escrito.jpg'
           },
           {
             'id': '1',
-            'title': 'Black History Month',
-            'timeString': 'February 2021',
-            'imageURL': 'images/black_history_month.png'
-          },
-          {
-            'id': '1',
-            'title': 'Ebony Excellence Awards',
-            'timeString': 'April 13, 2021 1-2 PM',
-            'imageURL': 'images/excellence_awards.png'
-          },
-          {
-            'id': '1',
-            'title': '50th Anniversary Celebration',
-            'timeString': 'April 13, 2021 1-2 PM',
-            'imageURL': 'images/bnaacc.jpg'
+            'title': 'Dia De Las Madres',
+            'timeString': 'April 9, 2021',
+            'imageURL': 'images/la_casa.jpg'
           },
         ],
       ),
